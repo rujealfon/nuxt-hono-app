@@ -43,7 +43,7 @@ await userId.parseAsync("abc123");
 
 ```typescript
 const schema = baseSchema.refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
+  error: "Passwords do not match",
   path: ["confirmPassword"],
   when(payload) {
     return baseSchema
@@ -108,7 +108,17 @@ const idToUser = z.string().transform(async (id) => db.getUserById(id));
 const user = await idToUser.parseAsync("abc123");
 ```
 
-**Important**: `.transform()` is one-directional. Calling `.encode()` on a schema that contains a transform throws a runtime `Error` (not a `ZodError`). If you need the transform to be reversible — a network boundary, a form that round-trips — use `z.codec()` instead; see [codecs.md](codecs.md).
+**Important**: `.transform()` is one-directional. Calling `.encode()` on a schema that contains a transform throws a runtime `Error` (not a `ZodError`). The output type is a black box, so `z.toJSONSchema()` cannot represent it soundly. If you need the transform to be reversible — a network boundary, a form that round-trips — use `z.codec()` instead; see [codecs.md](codecs.md).
+
+### `.overwrite()`
+
+When the value stays the same inferred type (trim, clamp, square, normalize), use `.overwrite()` instead of `.transform()`. It is stored as a refinement, returns the original schema class, and stays JSON-Schema-able. `.trim()` / `.toLowerCase()` / `.toUpperCase()` are implemented this way.
+
+```typescript
+z.number().overwrite((val) => val ** 2).max(100); // still ZodNumber
+```
+
+Do not use `.overwrite()` to change types — that is `.transform()` or `z.codec()`.
 
 `.preprocess()` is the inverse convenience form — "pipe a transform into a schema":
 

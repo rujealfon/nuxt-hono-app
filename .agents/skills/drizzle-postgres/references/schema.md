@@ -14,7 +14,12 @@ export const users = pgTable('users', {
 });
 ```
 
-Column builders can be called with or without an explicit DB column name (`text('full_name')` vs `text()` inferring `full_name` from the property via config `casing: "snake_case"`, or staying camelCase if unset). Match whatever convention the project already uses — check `drizzle.config.ts`'s `casing` option and existing tables before picking one.
+Column builders can be called with or without an explicit DB column name (`text('full_name')` vs `text()`, which derives the name from the property). An explicit name is always used verbatim; how an *unnamed* column is derived depends on the installed version:
+
+- **0.45.x** — the global `casing: "snake_case"` option, set on `drizzle()` and in `drizzle.config.ts`. Unset means the property name is used as-is (camelCase).
+- **1.0** — the global option is gone. Casing is per table: `snakeCase.table(...)` / `camelCase.table(...)` from `drizzle-orm/pg-core`, while plain `pgTable` applies no transform. See [migration-0.45-to-1.0.md](migration-0.45-to-1.0.md).
+
+Match whatever convention the project already uses — check existing tables and, on 0.45.x, `drizzle.config.ts`'s `casing` option before picking one.
 
 ## Column type builders
 
@@ -28,6 +33,7 @@ Column builders can be called with or without an explicit DB column name (`text(
 - `text()` — unlimited length
 - `varchar({ length })` — bounded length
 - `char({ length })` — fixed length, blank-padded
+- Postgres arrays: `text().array()`, `integer().array()` — chain `.array()` on a column builder. On 1.0, multidimensional arrays use `column.array('[][]')` instead of `.array().array()`; see [migration-0.45-to-1.0.md](migration-0.45-to-1.0.md).
 
 **Other scalars**
 - `boolean()`

@@ -14,7 +14,8 @@ export default defineConfig({
   },
   verbose: true,                    // print SQL during `push`
   strict: true,                     // confirm destructive changes before `push`
-  casing: 'snake_case',             // JS camelCase -> DB snake_case column mapping
+  casing: 'snake_case',             // 0.45.x only — JS camelCase -> DB snake_case column mapping.
+                                    // Removed in 1.0; use snakeCase.table(...) per table instead.
   migrations: {
     table: '__drizzle_migrations',  // defaults shown
     schema: 'drizzle',

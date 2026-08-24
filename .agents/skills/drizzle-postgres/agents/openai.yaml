@@ -1,6 +1,6 @@
 interface:
   display_name: "Drizzle ORM (PostgreSQL)"
   short_description: "Build reliable Drizzle ORM Postgres data layers"
-  default_prompt: "Use $drizzle-postgres to implement and verify Drizzle ORM schemas, queries, and migrations for PostgreSQL in this project."
+  default_prompt: "Use $drizzle-postgres to add a users/posts schema with relations to this Postgres project."
 policy:
   allow_implicit_invocation: true

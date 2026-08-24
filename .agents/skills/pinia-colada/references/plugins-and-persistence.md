@@ -81,7 +81,7 @@ Verify callback argument order against installed types. Use query `meta` to keep
 
 When using `true`, set a meaningful `staleTime`. The plugin is timer-based and effectively client-only; verify server behavior before enabling it in custom SSR. Pause queries with `enabled` when polling is not appropriate.
 
-Auto-refetch is not automatically equivalent to TanStack focus, reconnect, background-tab, or network-mode policies. Inventory those behaviors separately and use a verified plugin or application event integration when parity is required.
+Focus/reconnect/mount refetching is **core**, not this plugin: `refetchOnMount`, `refetchOnWindowFocus`, and `refetchOnReconnect` default to `true` and also accept `'always'`. Use the auto-refetch plugin only for interval polling.
 
 ## Retry
 

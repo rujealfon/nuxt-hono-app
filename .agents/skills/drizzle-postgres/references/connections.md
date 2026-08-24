@@ -81,7 +81,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle({ client: pool });
 ```
 
-`neon-http` cannot run multi-statement interactive transactions (each call is its own HTTP request) — reach for `neon-serverless` if the code needs `db.transaction()`. In a traditional long-running server talking to Neon, plain `pg`/`postgres.js` also work over Neon's regular TCP endpoint.
+`neon-http` cannot run multi-statement interactive transactions (each call is its own HTTP request) — reach for `neon-serverless` if the code needs `db.transaction()`. In Node, `neon-serverless` also needs the `ws` package (`neonConfig.webSocketConstructor = ws`). In a traditional long-running server talking to Neon, plain `pg`/`postgres.js` also work over Neon's regular TCP endpoint.
 
 ## Supabase
 
@@ -132,9 +132,71 @@ const db = drizzle({ client });
 
 Runs Postgres compiled to WASM with no separate server process — useful for unit/integration tests that want real Postgres semantics without a Docker container, or local-first apps.
 
+## PlanetScale Postgres
+
+PlanetScale Postgres is Postgres, not PlanetScale MySQL (`drizzle-orm/planetscale-serverless` is the MySQL driver — do not use it here).
+
+Server/container: `drizzle-orm/node-postgres` with `pg`, same as above. Prefer port `6432` (PgBouncer) when many concurrent clients will share the cluster; `5432` is a direct connection counted against `max_connections`.
+
+Serverless/edge: the Neon serverless driver works against PlanetScale Postgres **only** after overriding the Neon endpoints:
+
+```typescript
+import { neon, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+
+neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
+const db = drizzle({ client: neon(process.env.DATABASE_URL!) });
+```
+
+WebSocket/`db.transaction()` uses `drizzle-orm/neon-serverless` and must disable Neon's default pipeline:
+
+```typescript
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+
+neonConfig.pipelineConnect = false;
+neonConfig.wsProxy = (host, port) => `${host}/v2?address=${host}:${port}`;
+const db = drizzle({ client: new Pool({ connectionString: process.env.DATABASE_URL }) });
+```
+
+Official topic: [PlanetScale Postgres](https://orm.drizzle.team/docs/connect-planetscale-postgres).
+
+## Prisma Postgres
+
+No unique Drizzle driver. Use `drizzle-orm/node-postgres` or `drizzle-orm/postgres-js` against the Prisma Postgres connection string. Prisma's own serverless driver is not wired up in Drizzle yet.
+
+## Bun SQL
+
+Bun's native Postgres client, no extra driver package:
+
+```typescript
+import { drizzle } from 'drizzle-orm/bun-sql';
+const db = drizzle(process.env.DATABASE_URL);
+```
+
+Or pass an existing `SQL` client: `drizzle({ client: new SQL(process.env.DATABASE_URL!) })`. Bun-only — do not import `drizzle-orm/bun-sql` from Node.
+
+## Drizzle HTTP proxy
+
+When queries must go through your own HTTP endpoint instead of a direct driver:
+
+```typescript
+import { drizzle } from 'drizzle-orm/pg-proxy';
+
+const db = drizzle(async (sql, params, method) => {
+  const rows = await fetch('/query', {
+    method: 'POST',
+    body: JSON.stringify({ sql, params, method }),
+  }).then((r) => r.json());
+  return { rows };
+});
+```
+
+Return `{ rows: string[][] }` for `method === 'all'`, `{ rows: string[] }` for `execute`. Official topic: [Drizzle HTTP proxy](https://orm.drizzle.team/docs/connect-drizzle-proxy).
+
 ## Other providers (same shape, different package)
 
-Xata, Nile, Netlify DB, and AWS Data API for Postgres each ship a `drizzle-orm/<provider>` entry point following the same `drizzle(...)`/`drizzle({ client })` pattern as above — install the provider's official client package plus `drizzle-orm`, then check that provider's page in the [official docs](https://orm.drizzle.team/docs/overview) for the exact import path and any provider-specific connection quirks (e.g. AWS Data API needs a `resourceArn`/`secretArn` instead of a connection string).
+Xata and Nile follow the same `drizzle(...)` / `drizzle({ client })` shape as above. AWS Data API is `drizzle-orm/aws-data-api/pg` and takes `resourceArn` / `secretArn` / `database` instead of a URL. Netlify DB (`drizzle-orm/netlify-db`) and Effect Postgres (`drizzle-orm/effect-postgres`) are 1.0-line drivers — see [migration-0.45-to-1.0.md](migration-0.45-to-1.0.md).
 
 ## `db.execute` for anything outside the query builder
 

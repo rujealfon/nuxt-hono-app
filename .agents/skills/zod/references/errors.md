@@ -91,7 +91,7 @@ async function loadLocale(locale: string) {
 z.config(z.locales.en());
 ```
 
-40+ locales are available, including `ar`, `de`, `es`, `fr`, `frCA`, `he`, `hi` (via `hy`/others), `id`, `it`, `ja`, `ko`, `pl`, `pt`, `ru`, `th`, `tr`, `uk`, `vi`, `zhCN`, `zhTW`, among others.
+40+ locales are available, including `ar`, `de`, `es`, `fr`, `frCA`, `he`, `id`, `it`, `ja`, `ko`, `pl`, `pt`, `ru`, `th`, `tr`, `uk`, `vi`, `zhCN`, `zhTW`, among others.
 
 ## Error precedence
 

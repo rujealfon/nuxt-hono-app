@@ -3,6 +3,12 @@
 Build, review, migrate, test, and troubleshoot asynchronous data workflows
 with Pinia Colada in Vue and Nuxt applications.
 
+## Version
+
+- Skill version: **1.0.1** — see [CHANGELOG.md](CHANGELOG.md)
+- Tracks: `@pinia/colada` 1.x — verified against 1.4.2 on 2026-08-23
+- Docs: https://pinia-colada.esm.dev/llms.txt
+
 ## Installation
 
 Install the skill with:
@@ -19,22 +25,9 @@ Use $pinia-colada to implement and verify async data fetching in this Vue applic
 
 ## Coverage
 
-The skill provides focused guidance for:
+Queries, mutations, cache, Vue/Nuxt/SSR, official plugins, persistence, TanStack Vue Query migration, and `PINIA_COLADA_*` diagnostics. The installed `@pinia/colada` declarations remain the API authority.
 
-- Installation and Vue application setup
-- Nuxt and custom SSR integration
-- Queries, query keys, metadata, pagination, and infinite queries
-- Mutations, invalidation, prefetching, and optimistic updates
-- Cache consistency and concurrent mutation policies
-- Official plugins and custom plugin authoring
-- Cache persistence, serialization, expiry, and identity isolation
-- Testing and troubleshooting
-- TanStack Vue Query migrations, compatibility helpers, and codemods
-
-The target project's installed Pinia Colada declarations and source remain the
-authority for version-specific APIs. The skill directs agents to consult the
-official documentation when installed code does not answer a current behavior
-question.
+Won't add: community plugin directory.
 
 ## Contents
 
