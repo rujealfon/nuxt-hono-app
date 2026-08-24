@@ -5,6 +5,8 @@ Drizzle has two generations of the relations API. **Check which one is installed
 - If the project imports `relations` from `'drizzle-orm'` and calls `one(...)`/`many(...)` inside it, or if `drizzle-orm/pg-core`'s installed version predates the `defineRelations` export, use the **legacy API** below — this is what almost all Drizzle codebases in production use today.
 - If `defineRelations` is exported from `'drizzle-orm'` (check `node_modules/drizzle-orm/index.d.ts` or the project's own schema file) and the project already uses it, use the **new API**. Only introduce the new API into an existing project if asked to migrate; don't mix the two relation-declaration styles in one schema.
 
+**On Drizzle 1.0 the choice is made for you:** `relations` is no longer exported at all, so the legacy API below is dead code there and `defineRelations` is the only option. The legacy section remains because 0.45.x is still the stable release. See [migration-0.45-to-1.0.md](migration-0.45-to-1.0.md) for converting between them.
+
 Either way, relations are declared **separately from foreign keys**. A `.references()` foreign key alone does not give you `db.query` support — you also need a `relations`/`defineRelations` block, and both need to be passed into `drizzle()` via the `schema`/`relations` option for `db.query` to exist at all.
 
 ## Legacy API: `relations()` + `one()` / `many()`

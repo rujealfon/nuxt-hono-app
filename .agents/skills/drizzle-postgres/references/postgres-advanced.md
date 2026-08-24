@@ -14,7 +14,7 @@ export const posts = pgTable('posts', {
   index('author_idx').on(table.authorId),                 // plain index; index FKs used in joins/where
   uniqueIndex('slug_idx').on(table.slug),
   check('age_check', sql`${table.age} > 0`),
-  unique('unique_name', { nulls: 'not distinct' }).on(table.authorId, table.slug), // composite unique, PG15+
+  unique('unique_name').on(table.authorId, table.slug).nullsNotDistinct(), // composite unique, PG15+
 ]);
 ```
 
@@ -111,7 +111,7 @@ export const documents = pgTable('documents', {
 ]);
 ```
 
-Adding a policy enables RLS on the table automatically. Enable `entities: { roles: true }` in `drizzle.config.ts` so Drizzle Kit manages role DDL alongside tables.
+Adding a policy enables RLS on the table automatically. Enable `entities: { roles: true }` in `drizzle.config.ts` so Drizzle Kit manages role DDL alongside tables. On 1.0, `pgTable(...).enableRLS()` is deprecated in favour of `pgTable.withRLS(...)` — see [migration-0.45-to-1.0.md](migration-0.45-to-1.0.md).
 
 **Neon**: `import { crudPolicy, authenticatedRole, authUid } from 'drizzle-orm/neon'` — `crudPolicy({ role: authenticatedRole, read: true, modify: false })` generates the CRUD policies for you.
 
@@ -155,6 +155,23 @@ export const locations = pgTable('locations', {
 });
 ```
 
+## Query cache (0.45.x+)
+
+`upstashCache` ships in 0.45.x (`drizzle-orm/cache/upstash`). It is **opt-in** (`global: false` by default): enable per query with `.$withCache()`, or pass `global: true` when wrapping `drizzle()`. It does not apply inside transactions, `db.execute`, or the relational query API.
+
+```typescript
+import { upstashCache } from 'drizzle-orm/cache/upstash';
+
+const db = drizzle(process.env.DATABASE_URL!, {
+  cache: upstashCache({ url: process.env.UPSTASH_REDIS_REST_URL!, token: process.env.UPSTASH_REDIS_REST_TOKEN! }),
+});
+
+await db.select().from(users).$withCache();
+await db.$cache.invalidate({ tables: [users] });
+```
+
+Official topic: [Cache](https://orm.drizzle.team/docs/cache).
+
 ## Batch API and read replicas
 
 Some serverless drivers (e.g. Neon HTTP) expose `db.batch([...queries])` to send multiple independent queries in one round trip — check whether the connected driver supports it before relying on it; it's not universal across all Postgres drivers the way `db.transaction()` is.
@@ -163,8 +180,13 @@ Some serverless drivers (e.g. Neon HTTP) expose `db.batch([...queries])` to send
 
 ## Validation integration (Zod)
 
+On **0.45.x** the helpers live in the standalone `drizzle-zod` package (`npm i drizzle-zod`). On **1.0** they moved into `drizzle-orm/zod` (and `drizzle-orm/valibot`, `drizzle-orm/typebox`, etc.) — see [migration-0.45-to-1.0.md](migration-0.45-to-1.0.md).
+
 ```typescript
-import { createSelectSchema, createInsertSchema, createUpdateSchema } from 'drizzle-orm/zod';
+// 0.45.x
+import { createSelectSchema, createInsertSchema, createUpdateSchema } from 'drizzle-zod';
+// 1.0
+// import { createSelectSchema, createInsertSchema, createUpdateSchema } from 'drizzle-orm/zod';
 
 const insertUserSchema = createInsertSchema(users, {
   email: (schema) => schema.email(), // refine/override a specific field's Zod schema
@@ -173,4 +195,4 @@ const insertUserSchema = createInsertSchema(users, {
 const newUser = insertUserSchema.parse(req.body);
 ```
 
-`createInsertSchema` requires columns without defaults, makes defaulted/nullable columns optional; `createUpdateSchema` makes every column optional (for `PATCH`-style partial updates); `createSelectSchema` matches what a `select()` returns. Equivalent helpers exist for Valibot, TypeBox, ArkType, and Effect Schema under `drizzle-orm/valibot`, `drizzle-orm/typebox`, etc. — same shape, swap the import to match whichever validation library the project already uses.
+`createInsertSchema` requires columns without defaults, makes defaulted/nullable columns optional; `createUpdateSchema` makes every column optional (for `PATCH`-style partial updates); `createSelectSchema` matches what a `select()` returns. Equivalent helpers exist for Valibot, TypeBox, ArkType (and on 1.0, Effect Schema).

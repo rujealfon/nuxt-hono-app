@@ -33,7 +33,7 @@ app.use(PiniaColada, {
 app.mount('#app')
 ```
 
-Preserve an application's existing bootstrap structure. Install optional development tools only when requested or consistent with the repository; do not add production devtools automatically.
+Preserve an application's existing bootstrap structure. In new Vue apps, install `@pinia/colada-devtools` as a dev dependency and mount `<PiniaColadaDevtools />` at the end of the root template. Do not enable it in production unless asked.
 
 ## Nuxt
 
@@ -77,7 +77,7 @@ import {
 } from '@pinia/colada'
 
 app.use(PiniaColada, {
-  plugins: [PiniaColadaSSRNoGc()],
+  plugins: import.meta.env.SSR ? [PiniaColadaSSRNoGc()] : [],
 })
 
 // Clear the request-scoped cache after rendering.

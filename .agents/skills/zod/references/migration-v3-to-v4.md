@@ -97,7 +97,7 @@ See [refinements-transforms.md](refinements-transforms.md) for more on this dist
 - `.strict()`/`.passthrough()` deprecated (kept, not removed) in favor of `z.strictObject()`/`z.looseObject()`.
 - `.strip()` deprecated — it was always the default; use `z.object(A.shape)` to convert a strict schema to a regular one.
 - `.deepPartial()` **removed**, no direct replacement — it was flagged as an anti-pattern with implementation footguns.
-- `z.any()`/`z.unknown()` fields are no longer implicitly optional in the inferred type: `z.object({ a: z.any() })` infers `{ a: any }`, not `{ a?: any }`.
+- `z.any()`/`z.unknown()` fields are no longer implicitly optional: `z.object({ a: z.any() })` infers `{ a: any }` (not `{ a?: any }`), and as of 4.4.0 a missing key also fails at parse time (`{ a: undefined }` still passes).
 - `.merge()` deprecated in favor of `.extend()` (or spread syntax, which also has better `tsc` performance): `BaseSchema.merge(Other)` → `BaseSchema.extend(Other.shape)`.
 
 ## `z.nativeEnum()` deprecated
@@ -146,7 +146,7 @@ fn.implementAsync(async (s) => s.length); // new — dedicated async variant
 - `z.ostring()`, `z.onumber()`, etc. (undocumented optional-string shorthands) — removed.
 - `z.literal()` no longer accepts `symbol` values.
 - Static `.create()` factories (`z.ZodString.create()`) — removed; use the top-level `z.string()` etc.
-- `z.record(valueSchema)` single-argument form — removed; always pass both key and value schemas: `z.record(z.string(), z.string())`.
+- `z.record(valueSchema)` single-argument form was dropped in 4.0, then restored in 4.4.0 (key defaults to `z.string()`). Prefer the two-arg form `z.record(z.string(), z.string())` anyway.
 - `z.record()` with an enum/literal key schema is now exhaustive (requires every key present) rather than partial — use `z.partialRecord()` for the old partial behavior.
 - `z.intersection()` throws a plain `Error` (not a `ZodError`) when the two branches produce unmergeable results — this indicates a structurally broken schema, not a validation failure.
 - `z.promise()` deprecated — `await` the value before parsing.

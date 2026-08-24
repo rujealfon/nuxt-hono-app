@@ -24,8 +24,8 @@ const createTodo = useMutation({
 })
 ```
 
-- `mutate(variables)` starts the operation and handles the rejected promise through mutation state and hooks.
-- `mutateAsync(variables)` returns a promise; use it when surrounding control flow must await or catch the result.
+- `mutate(variables)` starts the operation and **swallows** the error: it is written to mutation state and passed to `onError`, but not rethrown. Do not wrap `mutate()` in `try/catch` expecting a throw.
+- `mutateAsync(variables)` rethrows after hooks. Wrap it in `try/catch` when surrounding control flow must handle failure.
 - Keep mutation inputs explicit so `variables` and hook arguments remain useful and typed.
 - Use `state.status` for result state and `asyncStatus` for active work.
 - Configure `onMutate`, `onSuccess`, `onError`, and `onSettled` according to the installed version.

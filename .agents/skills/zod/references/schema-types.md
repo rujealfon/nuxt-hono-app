@@ -220,8 +220,14 @@ z.number().multipleOf(5); // alias .step(5)
 
 z.nan(); // validates NaN specifically, if you actually need that
 
-z.int();   // safe integer range
-z.int32(); // int32 range
+z.int();     // safe integer range
+z.int32();   // [-2147483648, 2147483647]
+z.uint32();  // [0, 4294967295]
+z.float32();
+z.float64();
+
+z.int64();   // ZodBigInt, signed 64-bit range
+z.uint64();  // ZodBigInt, unsigned 64-bit range
 
 z.bigint().gt(5n).gte(5n).lt(5n).lte(5n).positive().nonnegative().negative().nonpositive().multipleOf(5n);
 
@@ -285,6 +291,8 @@ z.nullable(z.literal("yoda")); // or .nullable()
 nullableYoda.unwrap();
 
 z.nullish(z.literal("yoda"));  // optional AND nullable
+
+z.exactOptional(z.string()); // or z.string().exactOptional() — absent key ok, explicit undefined fails
 
 z.any();     // inferred type: any
 z.unknown(); // inferred type: unknown
@@ -403,12 +411,12 @@ const stringOrNumber = z.union([z.string(), z.number()]);
 stringOrNumber.options; // [ZodString, ZodNumber]
 ```
 
-`z.xor()` requires *exactly one* option to match — it fails on zero matches AND on multiple matches (useful for mutually-exclusive payload shapes):
+`z.xor()` requires *exactly one* option to match — it fails on zero matches AND on multiple matches (useful for mutually-exclusive payload shapes). Default `z.object()` strips unknown keys, so two object branches can both match; use `z.strictObject()` on the narrower branch:
 
 ```typescript
 const payment = z.xor([
-  z.object({ type: z.literal("card"), cardNumber: z.string() }),
-  z.object({ type: z.literal("bank"), accountNumber: z.string() }),
+  z.strictObject({ type: z.literal("card"), cardNumber: z.string() }),
+  z.strictObject({ type: z.literal("bank"), accountNumber: z.string() }),
 ]);
 ```
 

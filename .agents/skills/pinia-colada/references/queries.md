@@ -34,14 +34,23 @@ const {
 })
 ```
 
-- `state.status` describes the cached data: `pending`, `success`, or `error`.
-- `asyncStatus` describes current work: `idle` or `loading`.
+- `state.status` describes the cached data: `pending`, `success`, or `error`. `isPending` is `status === 'pending'`.
+- `asyncStatus` describes current work: `idle` or `loading`. `isLoading` is `asyncStatus === 'loading'` (TanStack's `isFetching`, not TanStack's `isLoading`).
 - Existing data can remain available while a background refresh is loading or fails.
 - `refresh()` deduplicates work and respects freshness.
 - `refetch()` forces a new request regardless of freshness.
 - Use the grouped `state` discriminated union when TypeScript must narrow `data` or `error`.
 
-Throw or reject from the query function for Pinia Colada to enter an error state. Native `fetch()` does not reject on HTTP 4xx/5xx, so check `response.ok` unless non-success responses intentionally belong in `data`.
+Throw or reject from the query function for Pinia Colada to enter an error state. Native `fetch()` does not reject on HTTP 4xx/5xx, so check `response.ok` unless non-success responses intentionally belong in `data`. When a refetch fails, `error` is set **and previous `data` is kept** — show stale data plus an error banner rather than blanking the UI.
+
+The query function is called as `query({ signal, entry })`. `signal` is an `AbortSignal` aborted when a newer request for the same key starts or when the cache cancels the entry. Pass it through:
+
+```ts
+query: ({ signal }) => fetch(`/api/todos`, { signal }).then((r) => {
+  if (!r.ok) throw new Error(r.statusText)
+  return r.json()
+})
+```
 
 ## Reactive inputs and keys
 
@@ -142,7 +151,7 @@ useQuery({
 })
 ```
 
-Treat placeholder data as display continuity, not confirmed data for the new key. Use `isPlaceholderData` when controls or messaging depend on that distinction.
+Treat placeholder data as display continuity, not confirmed data for the new key. Use `isPlaceholderData` when controls or messaging depend on that distinction. `initialData` writes a `success` entry into the cache (and is SSR-serialized); `placeholderData` is display-only and is not.
 
 Use `useInfiniteQuery()` when pages form one growing result:
 
@@ -181,6 +190,11 @@ Call defined queries within component setup, a store, or an active effect scope 
 
 ## Cancellation
 
-Treat cancellation as cooperative. Use the abort signal or cancellation mechanism exposed by the installed version inside the request function, and avoid committing results from obsolete requests. During an optimistic mutation, snapshot current data, cancel relevant in-flight work, then write the optimistic value so an older response cannot overwrite it.
+`signal` on the query context is an `AbortSignal`. It aborts when:
 
-Official topics: [Queries](https://pinia-colada.esm.dev/guide/queries.html), [Query keys](https://pinia-colada.esm.dev/guide/query-keys.html), and [Infinite queries](https://pinia-colada.esm.dev/guide/infinite-queries.html).
+- a new request for the same key starts (the previous pending call is aborted first);
+- `queryCache.cancelQueries({ key })` or `queryCache.cancel(entry)` runs.
+
+Without passing `signal` into `fetch`/the client, Colada still discards the obsolete result, but the HTTP work keeps running. Invalidation marks data stale and refetches active matches; cancellation aborts in-flight work without refetching. During an optimistic mutation, snapshot current data, cancel related in-flight queries, then write the optimistic value so an older response cannot overwrite it.
+
+Official topics: [Queries](https://pinia-colada.esm.dev/guide/queries.html), [Query keys](https://pinia-colada.esm.dev/guide/query-keys.html), [Canceling queries](https://pinia-colada.esm.dev/guide/cancelling-queries.html), [Error handling](https://pinia-colada.esm.dev/guide/error-handling.html), and [Infinite queries](https://pinia-colada.esm.dev/guide/infinite-queries.html).

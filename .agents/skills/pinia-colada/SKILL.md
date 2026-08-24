@@ -1,6 +1,6 @@
 ---
 name: pinia-colada
-description: Build, review, migrate, test, and troubleshoot async data workflows with Pinia Colada in Vue and Nuxt applications. Use for @pinia/colada installation and setup, queries, mutations, query keys, cache updates and invalidation, optimistic updates, pagination and infinite queries, SSR and Nuxt integration, plugins, testing, TypeScript, TanStack Vue Query migrations, and Pinia Colada runtime errors.
+description: Build, review, migrate, test, and troubleshoot async data workflows with Pinia Colada in Vue and Nuxt applications. Use for @pinia/colada setup, useQuery/useMutation, query keys, cache updates and invalidation, optimistic updates, pagination and infinite queries, SSR and Nuxt, plugins, testing, TypeScript, TanStack Vue Query migrations, and PINIA_COLADA runtime errors. Use when the user runs /pinia-colada.
 ---
 
 # Pinia Colada
@@ -18,25 +18,26 @@ If a bundled reference conflicts with installed TypeScript declarations or sourc
 
 ## Read the relevant reference
 
-- Read [references/queries.md](references/queries.md) for `useQuery`, key factories, reusable queries, pagination, infinite queries, status handling, and TypeScript.
-- Read [references/cache-and-mutations.md](references/cache-and-mutations.md) for `useMutation`, invalidation, cache operations, prefetching, and optimistic updates.
+- Read [references/queries.md](references/queries.md) for `useQuery`, keys, reusable queries, pagination, infinite queries, `AbortSignal` cancellation, and error typing.
+- Read [references/cache-and-mutations.md](references/cache-and-mutations.md) for `useMutation` (`mutate` vs `mutateAsync`), invalidation, cache operations, prefetching, and optimistic updates.
 - Read [references/integrations.md](references/integrations.md) for Vue setup, Nuxt, custom SSR, and testing.
-- Read [references/plugins-and-persistence.md](references/plugins-and-persistence.md) for official plugins, cache persistence, custom plugin authoring, module augmentation, and plugin lifecycle.
-- Read [references/migration.md](references/migration.md) for TanStack Vue Query migration, compatibility helpers, semantic differences, and Pinia Colada version codemods.
-- Read [references/troubleshooting.md](references/troubleshooting.md) when diagnosing runtime codes, injection-context failures, cache misuse, or infinite-query errors.
+- Read [references/plugins-and-persistence.md](references/plugins-and-persistence.md) for official plugins (including query-hooks `onError` + `entry.meta`), cache persistence, and custom plugins.
+- Read [references/migration.md](references/migration.md) for TanStack Vue Query migration, compatibility helpers, and codemods.
+- Read [references/troubleshooting.md](references/troubleshooting.md) when diagnosing `PINIA_COLADA_*` codes, injection-context failures, cache misuse, or infinite-query errors.
 
 These references are intentionally curated rather than copies of upstream documentation. If the user asks for current or version-specific behavior that local declarations do not answer, consult the matching page in the [official Pinia Colada documentation](https://pinia-colada.esm.dev/) and state which version or source you followed.
 
 ## Implement deliberately
 
-- Install `PiniaColada` after Pinia and integrate it at the existing application bootstrap point.
-- Model query keys as serializable hierarchical arrays. Include every reactive input used by the query function in the key.
-- Prefer reusable query definitions and key factories when the project repeats queries or cache operations.
-- Distinguish initial data status from active fetch status. Preserve stale data and error behavior intentionally.
-- Choose `refresh`, `refetch`, prefetching, invalidation, or direct cache updates according to the desired freshness and network behavior.
-- Keep mutation inputs explicit. Define success, error, and settled behavior, and make optimistic updates reversible.
-- Treat SSR hydration, Nuxt module behavior, cache persistence, retries, and refetch plugins as opt-in integration concerns; consult their dedicated pages before changing them.
-- Use TanStack compatibility helpers only when the migration or interoperability task calls for them.
+- Install `PiniaColada` after Pinia at the existing bootstrap point.
+- Model query keys as serializable hierarchical arrays and put every reactive input the query function reads into the key.
+- Pass the query context `signal: AbortSignal` into `fetch` (or the client's abort option). Cancellation discards the result either way; without `signal`, the HTTP work keeps running.
+- Throw or reject from the query/mutation function for HTTP failures — native `fetch()` does not. Previous `data` is kept when a refetch fails; render stale data plus the new `error`.
+- `mutate()` swallows the error (state + `onError` only). `mutateAsync()` rethrows after hooks — wrap it in `try/catch`.
+- Prefer reusable query definitions and key factories once the project repeats queries or cache operations.
+- Use `refresh()` for freshness-aware work and `refetch()` to force a request. Invalidate by key prefix; use `exact: true` for one entry. Make optimistic updates snapshot, cancel, write, and roll back only if the optimistic value is still current.
+- Treat SSR, Nuxt, persistence, retry, and auto-refetch as opt-in; read their reference before changing them.
+- Use TanStack compatibility helpers only when the migration task calls for them.
 
 ## Troubleshoot from evidence
 

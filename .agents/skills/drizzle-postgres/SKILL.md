@@ -1,11 +1,11 @@
 ---
 name: drizzle-postgres
-description: Build, review, migrate, and troubleshoot PostgreSQL data layers with Drizzle ORM and Drizzle Kit. Use whenever the user is defining a Postgres schema with pgTable, writing Drizzle queries (select/insert/update/delete, joins, relational queries), setting up drizzle.config.ts, running drizzle-kit generate/migrate/push/pull/studio, wiring a Postgres driver (node-postgres, postgres.js, Neon, Supabase, Vercel Postgres, PGlite), adding indexes/constraints/relations, or debugging Drizzle/Postgres errors — even if they just say "add a table," "write a migration," or name a driver/provider without saying "Drizzle" explicitly. This skill is scoped to PostgreSQL only; for MySQL, SQLite, MSSQL, SingleStore, or CockroachCB projects, rely on general Drizzle knowledge instead.
+description: Build, review, migrate, and troubleshoot PostgreSQL data layers with Drizzle ORM and Drizzle Kit. Use when defining a Postgres schema with pgTable, writing Drizzle queries (select/insert/update/delete, joins, db.query), setting up drizzle.config.ts, running drizzle-kit generate/migrate/push/pull/studio, wiring a Postgres driver (pg, postgres.js, Neon, Supabase, PGlite, PlanetScale Postgres, Bun SQL), adding indexes/constraints/relations, or debugging Drizzle/Postgres errors — even if they just say "add a table" or "write a migration." Use when the user runs /drizzle-postgres. PostgreSQL only; for MySQL, SQLite, MSSQL, SingleStore, or CockroachDB, rely on general Drizzle knowledge.
 ---
 
 # Drizzle ORM (PostgreSQL)
 
-Drizzle's API differs meaningfully between versions — most notably the relations API changed from `relations()`/`one()`/`many()` to `defineRelations()`/`r.one`/`r.many` in newer releases. Treat the target project's installed `drizzle-orm` and `drizzle-kit` versions and local type declarations as the source of truth; use the references below as a curated starting point, not a substitute for checking what's actually installed.
+Drizzle's API differs meaningfully between versions. The relations API changed from `relations()`/`one()`/`many()` to `defineRelations()`/`r.one`/`r.many`, and Drizzle 1.0 (in release candidate as of 2026-08-22, with 0.45.x still stable) removes the legacy `relations()` export entirely and moves camelCase→snake_case mapping from a global config option to per-table builders. Treat the target project's installed `drizzle-orm` and `drizzle-kit` versions and local type declarations as the source of truth; use the references below as a curated starting point, not a substitute for checking what's actually installed.
 
 ## Start from the project
 
@@ -20,14 +20,15 @@ Drizzle's API differs meaningfully between versions — most notably the relatio
 - [references/relations.md](references/relations.md) — declaring relations (both the legacy `relations()`/`one()`/`many()` API and the newer `defineRelations()`/`r.one`/`r.many` API) and querying them with `db.query`.
 - [references/queries.md](references/queries.md) — select/insert/update/delete, operators, joins, transactions, set operations, dynamic query building.
 - [references/migrations.md](references/migrations.md) — `drizzle.config.ts`, Drizzle Kit commands (`generate`, `migrate`, `push`, `pull`, `check`, `studio`, `export`), custom SQL migrations, seeding.
-- [references/connections.md](references/connections.md) — driver setup for node-postgres, postgres.js, Neon, Supabase, Vercel Postgres, PGlite, and other providers.
-- [references/postgres-advanced.md](references/postgres-advanced.md) — indexes/constraints, views, generated columns, custom types, RLS, sequences, extensions (pgvector/PostGIS), batch API, read replicas, and Zod/Valibot validation integration.
+- [references/connections.md](references/connections.md) — driver setup for node-postgres, postgres.js, Neon, Supabase, Vercel Postgres, PGlite, PlanetScale Postgres, Bun SQL, HTTP proxy, and other providers.
+- [references/postgres-advanced.md](references/postgres-advanced.md) — indexes/constraints, views, generated columns, custom types, RLS, sequences, extensions (pgvector/PostGIS), query cache, batch API, read replicas, and Zod/Valibot validation integration.
+- [references/migration-0.45-to-1.0.md](references/migration-0.45-to-1.0.md) — the 0.45.x → 1.0 breaking changes (casing moved to table builders, `relations()` removed, `drizzle()` config shape) with before/after code and a migration checklist. Read this whenever a project is on the 1.0 RC, or when guidance that works on 0.45.x appears to have no effect.
 
-These are condensed and curated, not full copies of the upstream docs. For behavior not covered here or that looks version-sensitive, check the installed package or the [official Drizzle docs](https://orm.drizzle.team/docs/overview) and note which version you followed.
+These are condensed and curated, not full copies of the upstream docs. For behavior not covered here or that looks version-sensitive, check the installed package or the [official Postgres docs](https://orm.drizzle.team/docs/get-started-postgresql) and note which version you followed.
 
 ## Implement deliberately
 
-- Default to `pgTable` with explicit column names only when they need to differ from the camelCase JS property (Drizzle infers snake_case automatically via config `casing: "snake_case"`, or you can name columns explicitly — match whatever the project already does).
+- Default to `pgTable` with explicit column names only when they need to differ from the camelCase JS property. How unnamed columns get mapped is version-dependent: on 0.45.x it's the global `casing: "snake_case"` option (in `drizzle()` and `drizzle.config.ts`); on 1.0 that option is gone and casing is chosen per table via `snakeCase.table(...)`/`camelCase.table(...)` from `drizzle-orm/pg-core`. Match whatever the project already does, and see [references/migration-0.45-to-1.0.md](references/migration-0.45-to-1.0.md) if the two are mixed — a leftover `casing` option on 1.0 is a silent no-op that changes emitted SQL.
 - Add a foreign key with `.references()` at the column level for simple cases; use `foreignKey()` in the table's second argument for composite or self-referential keys.
 - Index columns used in `where`/`join`/`orderBy` conditions, especially foreign keys — Postgres does not auto-index them.
 - Prefer `generatedAlwaysAsIdentity()` for new auto-incrementing primary keys over `serial` (Postgres's own recommendation); keep `serial` only when matching an existing schema's convention.

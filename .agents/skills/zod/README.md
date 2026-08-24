@@ -4,6 +4,12 @@ Define, validate, and parse data with Zod (v4) — request bodies, form inputs,
 environment variables, API responses, and any other untrusted or external
 data in TypeScript/JavaScript.
 
+## Version
+
+- Skill version: **1.1.0** — see [CHANGELOG.md](CHANGELOG.md)
+- Tracks: `zod` 4.x — verified against 4.4.3 on 2026-08-23
+- Docs: https://zod.dev/llms.txt
+
 ## Installation
 
 Install the skill with:
@@ -20,21 +26,9 @@ Use $zod to validate this API request body and infer its TypeScript type.
 
 ## Coverage
 
-The skill provides focused guidance for:
+Zod 4 schemas, refinements/transforms (including `.overwrite()`), codecs, errors, JSON Schema, metadata/registries, and Zod 3 → 4 migration. The installed `zod` version is the API authority.
 
-- Schema types: primitives, string formats (email/URL/UUID/ISO dates/IP/JWT/hashes/etc.), numbers, objects and their modifiers, arrays/tuples, unions/discriminated unions/XOR/intersections, records, maps/sets, files, recursive schemas, template literals
-- Refinements and transforms: `.refine()`/`.superRefine()`/`.check()`, pipes, `.transform()`/`.preprocess()`, defaults/prefaults/catch, branded types, readonly, `z.function()`, `z.custom()`
-- Error handling: customizing messages (schema-level, per-parse, global, i18n locales) and formatting `ZodError` with `treeifyError`/`prettifyError`/`flattenError`
-- Codecs: bidirectional transforms with `z.codec()`, `.encode()`/`.decode()`, and ready-to-use implementations for common conversions
-- JSON Schema: `z.toJSONSchema()`/`z.fromJSONSchema()` for OpenAPI specs and LLM structured outputs
-- Metadata and registries: `.meta()`, `.describe()`, `z.globalRegistry`, custom registries
-- Migrating a codebase from Zod 3 to Zod 4, and choosing between regular Zod, Zod Mini, and `zod/v4/core`
-
-The target project's installed `zod` version is the authority for which API
-surface is valid — the skill directs agents to check what's actually
-installed before relying on a reference, since the string-format methods,
-error-customization API, and `.default()` semantics all changed meaningfully
-between Zod 3 and Zod 4.
+Won't add: `z.compile()` AOT (canary-only as of 4.4.3), `z.creditCard()` / `.exactPartial()` (post-4.4.3), ecosystem catalog, library-authors packaging beyond the existing Mini/core pointer.
 
 ## Contents
 
