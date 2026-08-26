@@ -39,14 +39,13 @@ ADMIN_PASSWORD='your-strong-password' pnpm docker:db:seed
 
 ## Images
 
-| Service          | Dockerfile                 | Notes                                                         |
-| ---------------- | -------------------------- | ------------------------------------------------------------- |
-| `api`            | `apps/api/Dockerfile`      | `tsx` on source; production `runner` stage                    |
-| `drizzle-studio` | `apps/api/Dockerfile`      | `development` target; schema bind-mounted                     |
-| `app`, `admin`   | `docker/Dockerfile.nuxt`   | Nuxt Node server                                              |
-| `web`            | `docker/Dockerfile.static` | nginx + prerendered files                                     |
-| `postgres`       | `postgres:18-alpine`       | Volume `postgres_data`                                        |
-| `redis`          | `redis:8-alpine`           | Host **6380** so it does not collide with local Redis on 6379 |
+| Service               | Dockerfile               | Notes                                                         |
+| --------------------- | ------------------------ | ------------------------------------------------------------- |
+| `api`                 | `apps/api/Dockerfile`    | `development` target; `tsx watch` on bind-mounted source      |
+| `drizzle-studio`      | `apps/api/Dockerfile`    | `development` target; schema bind-mounted                     |
+| `app`, `admin`, `web` | `docker/Dockerfile.nuxt` | `development` target; `nuxt dev` on bind-mounted source       |
+| `postgres`            | `postgres:18-alpine`     | Volume `postgres_data`                                        |
+| `redis`               | `redis:8-alpine`         | Host **6380** so it does not collide with local Redis on 6379 |
 
 Inside Compose, the API uses `postgres:5432` and `redis://redis:6379`. The host maps Postgres to **5433** and Redis to **6380**.
 

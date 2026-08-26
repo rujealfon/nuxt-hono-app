@@ -30,6 +30,12 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      target: development
+    command: pnpm --filter @nuxt-app/api dev
+    volumes:
+      - ./apps/api/src:/repo/apps/api/src
+      - ./packages/types/src:/repo/packages/types/src
+      - ./packages/env/src:/repo/packages/env/src
     ports:
       - '3001:3001'
     environment:
@@ -86,15 +92,27 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.nuxt
+      target: development
       args:
         PACKAGE: '@nuxt-app/app'
         APP_DIR: apps/app
+    command: pnpm --filter @nuxt-app/app exec nuxt dev --port 3000 --host 0.0.0.0
+    volumes:
+      - ./apps/app/app:/repo/apps/app/app
+      - ./apps/app/nuxt.config.ts:/repo/apps/app/nuxt.config.ts
+      - ./layers/base/app:/repo/layers/base/app
+      - ./layers/base/nuxt.config.ts:/repo/layers/base/nuxt.config.ts
+      - ./layers/base/load-root-env.ts:/repo/layers/base/load-root-env.ts
+      - ./layers/auth/app:/repo/layers/auth/app
+      - ./layers/auth/nuxt.config.ts:/repo/layers/auth/nuxt.config.ts
+      - ./layers/auth/colada.options.ts:/repo/layers/auth/colada.options.ts
+      - ./layers/auth/server:/repo/layers/auth/server
+      - ./packages/types/src:/repo/packages/types/src
+      - ./packages/auth/src:/repo/packages/auth/src
     ports:
       - '3000:3000'
     environment:
-      NODE_ENV: production
-      NITRO_HOST: 0.0.0.0
-      NITRO_PORT: 3000
+      NODE_ENV: development
       NUXT_PUBLIC_API_URL: ${NUXT_PUBLIC_API_URL:-http://localhost:3001}
     depends_on:
       api:
@@ -104,15 +122,27 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.nuxt
+      target: development
       args:
         PACKAGE: '@nuxt-app/admin'
         APP_DIR: apps/admin
+    command: pnpm --filter @nuxt-app/admin exec nuxt dev --port 3002 --host 0.0.0.0
+    volumes:
+      - ./apps/admin/app:/repo/apps/admin/app
+      - ./apps/admin/nuxt.config.ts:/repo/apps/admin/nuxt.config.ts
+      - ./layers/base/app:/repo/layers/base/app
+      - ./layers/base/nuxt.config.ts:/repo/layers/base/nuxt.config.ts
+      - ./layers/base/load-root-env.ts:/repo/layers/base/load-root-env.ts
+      - ./layers/auth/app:/repo/layers/auth/app
+      - ./layers/auth/nuxt.config.ts:/repo/layers/auth/nuxt.config.ts
+      - ./layers/auth/colada.options.ts:/repo/layers/auth/colada.options.ts
+      - ./layers/auth/server:/repo/layers/auth/server
+      - ./packages/types/src:/repo/packages/types/src
+      - ./packages/auth/src:/repo/packages/auth/src
     ports:
-      - '3002:3000'
+      - '3002:3002'
     environment:
-      NODE_ENV: production
-      NITRO_HOST: 0.0.0.0
-      NITRO_PORT: 3000
+      NODE_ENV: development
       NUXT_PUBLIC_API_URL: ${NUXT_PUBLIC_API_URL:-http://localhost:3001}
     depends_on:
       api:
@@ -121,13 +151,24 @@ services:
   web:
     build:
       context: .
-      dockerfile: docker/Dockerfile.static
+      dockerfile: docker/Dockerfile.nuxt
+      target: development
       args:
         PACKAGE: '@nuxt-app/web'
         APP_DIR: apps/web
-        NUXT_PUBLIC_APP_URL: ${NUXT_PUBLIC_APP_URL:-${APP_URL:-http://localhost:3000}}
+    command: pnpm --filter @nuxt-app/web exec nuxt dev --port 3003 --host 0.0.0.0
+    volumes:
+      - ./apps/web/app:/repo/apps/web/app
+      - ./apps/web/nuxt.config.ts:/repo/apps/web/nuxt.config.ts
+      - ./layers/base/app:/repo/layers/base/app
+      - ./layers/base/nuxt.config.ts:/repo/layers/base/nuxt.config.ts
+      - ./layers/base/load-root-env.ts:/repo/layers/base/load-root-env.ts
+      - ./packages/types/src:/repo/packages/types/src
     ports:
-      - '3003:80'
+      - '3003:3003'
+    environment:
+      NODE_ENV: development
+      NUXT_PUBLIC_APP_URL: ${NUXT_PUBLIC_APP_URL:-http://localhost:3000}
 
 volumes:
   postgres_data:

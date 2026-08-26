@@ -11,13 +11,15 @@ ARG PACKAGE
 COPY . .
 RUN turbo prune ${PACKAGE} --docker
 
-FROM base AS build
-ARG PACKAGE
+FROM base AS development
 COPY --from=pruner /repo/out/json/ .
 COPY --from=pruner /repo/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
     pnpm install --frozen-lockfile
 COPY --from=pruner /repo/out/full/ .
+
+FROM development AS build
+ARG PACKAGE
 RUN pnpm --filter ${PACKAGE} build
 
 FROM node:24-alpine AS runner
