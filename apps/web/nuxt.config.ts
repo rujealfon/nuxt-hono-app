@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     public: {
       appUrl: parsePublicUrl(
         process.env.NUXT_PUBLIC_APP_URL || process.env.APP_URL || resolveVercelPreviewUrl('nuxt-app-app'),
-        'http://localhost:3000',
+        'http://localhost:3001',
       ),
     },
   },

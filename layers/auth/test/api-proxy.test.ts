@@ -37,7 +37,7 @@ describe('apiProxyTarget', () => {
   })
 
   it('maps /__api to the API origin root', () => {
-    expect(apiProxyTarget('http://localhost:3001', 'http://localhost:3000/__api')).toBe('http://localhost:3001/')
+    expect(apiProxyTarget('http://localhost:3000', 'http://localhost:3001/__api')).toBe('http://localhost:3000/')
   })
 })
 
@@ -49,7 +49,7 @@ describe('resolveApiProxyOrigin', () => {
       NUXT_PUBLIC_API_URL: undefined,
     })
 
-    expect(resolveApiProxyOrigin('http://localhost:3001'))
+    expect(resolveApiProxyOrigin('http://localhost:3000'))
       .toBe('https://nuxt-app-api-git-feature-vercel-preview-rujealfons-projects.vercel.app')
   })
 
@@ -60,7 +60,7 @@ describe('resolveApiProxyOrigin', () => {
       NUXT_PUBLIC_API_URL: 'https://api.nuxt-app.com',
     })
 
-    expect(resolveApiProxyOrigin('http://localhost:3001')).toBe('https://api.nuxt-app.com')
+    expect(resolveApiProxyOrigin('http://localhost:3000')).toBe('https://api.nuxt-app.com')
   })
 })
 

@@ -7,7 +7,7 @@ import { parsePublicUrl } from '@nuxt-app/types'
 export function resolveApiProxyOrigin(bakedApiUrl: string): string {
   return parsePublicUrl(
     process.env.NUXT_PUBLIC_API_URL || resolveVercelPreviewUrl('nuxt-app-api') || bakedApiUrl,
-    bakedApiUrl || 'http://localhost:3001',
+    bakedApiUrl || 'http://localhost:3000',
   )
 }
 

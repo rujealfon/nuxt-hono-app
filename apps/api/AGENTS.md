@@ -5,16 +5,16 @@ Hono server. Repo-root `AGENTS.md` covers monorepo commands, shared imports, and
 ## Commands
 
 ```bash
-pnpm dev:api                         # tsx watch, http://localhost:3001
+pnpm dev:api                         # tsx watch, http://localhost:3000
 pnpm --filter @nuxt-app/api test     # vitest, app.request(), db nuxt_app_db_test
 pnpm --filter @nuxt-app/api test -- sessions.test.ts   # single file
 pnpm --filter @nuxt-app/api test -- -t "sweeps expired sessions when logging in"   # single test by name
 pnpm db:generate                     # after editing src/db/schema/
 pnpm db:migrate                      # also runs on boot in src/index.ts and on Vercel API builds (production and preview)
-pnpm db:seed                         # ADMIN_PASSWORD required
+pnpm db:ensure-admin                 # create/promote an admin; ADMIN_PASSWORD required
 ```
 
-Scalar is at http://localhost:3001/docs when `NODE_ENV=development`. Spec: `/openapi.json` (generated from routes).
+Scalar is at http://localhost:3000/docs when `NODE_ENV=development`. Spec: `/openapi.json` (generated from routes).
 
 ## Architecture
 
@@ -50,7 +50,7 @@ Logging is pino via `hono-pino` (`c.var.logger`, `LOG_LEVEL`).
 
 `src/env.ts` loads root `.env` then `apps/api/.env`. `resolveDatabaseUrl()` is the pooled runtime URL. `resolveMigrationDatabaseUrl()` is the direct URL used only by `runMigrations()` / drizzle-kit. `DATABASE_URL_UNPOOLED` is required in production when `DATABASE_URL` is a pooled endpoint. Neon uses `sslmode=verify-full`. Upstash `REDIS_URL` must be `rediss://`; local Compose stays `redis://`.
 
-`APP_URL`, `ADMIN_URL`, `WEB_URL`, and `REDIS_URL` are hard-required when `NODE_ENV=production` — `env.ts` calls `process.exit(1)` on boot if any is missing. On Vercel this is covered: `APP_URL`/`ADMIN_URL`/`WEB_URL` fall back to `resolveVercelPreviewUrl()` on Preview, and `REDIS_URL` is set for both Production and Preview. Deploying outside Vercel with `NODE_ENV=production` (e.g. Docker, a bare VM) means setting all four explicitly or the process won't boot. `API_URL` is not required — it's only meaningful for CORS in dev and defaults quietly.
+`APP_URL`, `ADMIN_URL`, `WEB_URL`, and `REDIS_URL` are hard-required when `NODE_ENV=production` — `env.ts` calls `process.exit(1)` on boot if any is missing. On Vercel this is covered: `APP_URL`/`ADMIN_URL`/`WEB_URL` fall back to `resolveVercelPreviewUrl()` on Preview, and `REDIS_URL` is set for both Production and Preview. Deploying outside Vercel with `NODE_ENV=production` (e.g. a bare VM) means setting all four explicitly or the process won't boot. `API_URL` is not required — it's only meaningful for CORS in dev and defaults quietly.
 
 Rate-limit knobs: `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MS`, `AUTH_RATE_LIMIT_MAX`. Rate limiting uses the socket address unless `TRUST_PROXY` is set (then the first `X-Forwarded-For` hop).
 

@@ -22,7 +22,7 @@ const productionRequired = ['APP_URL', 'ADMIN_URL', 'WEB_URL', 'REDIS_URL'] as c
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
-  API_PORT: z.coerce.number().default(3001),
+  API_PORT: z.coerce.number().default(3000),
   API_HOST: z.string().default('0.0.0.0'),
   API_URL: z.url().optional(),
   APP_URL: z.url().optional(),
@@ -59,8 +59,8 @@ export const envSchema = z.object({
   }
 }).transform(env => ({
   ...env,
-  API_URL: env.API_URL ?? 'http://localhost:3001',
-  APP_URL: env.APP_URL ?? 'http://localhost:3000',
+  API_URL: env.API_URL ?? 'http://localhost:3000',
+  APP_URL: env.APP_URL ?? 'http://localhost:3001',
   ADMIN_URL: env.ADMIN_URL ?? 'http://localhost:3002',
   WEB_URL: env.WEB_URL ?? 'http://localhost:3003',
   REDIS_URL: env.REDIS_URL ?? 'redis://localhost:6380',

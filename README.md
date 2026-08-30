@@ -25,7 +25,8 @@ pnpm + Turborepo. Four deployables, shared Nuxt layers, and shared TS packages.
 - **API**: Hono
 - **Auth**: Session cookie (`nuxt_app_session`), not JWTs
 - **DB**: PostgreSQL via Drizzle (Neon in production, `sslmode=verify-full`)
-- **Runtime**: Docker Compose (Postgres + Redis + all apps)
+- **Local data**: Docker Compose (Postgres + Redis + Drizzle Studio); apps on the host via `pnpm dev`
+- **Deploy**: Vercel (Neon Postgres, Upstash Redis)
 - **Rate limit**: `redis` (node-redis) + `hono-rate-limiter` (in-memory in tests). Production: [Upstash Redis](https://upstash.com/docs/redis) over `rediss://`
 - **Jobs**: [Upstash QStash](https://upstash.com/docs/qstash)
 - **Object storage**: [Cloudflare R2](https://developers.cloudflare.com/r2/)
@@ -36,8 +37,8 @@ pnpm + Turborepo. Four deployables, shared Nuxt layers, and shared TS packages.
 ```
 nuxt-app/
 ├── apps/
-│   ├── api/          # Hono backend (port 3001)
-│   ├── app/          # User app (port 3000)
+│   ├── api/          # Hono backend (port 3000)
+│   ├── app/          # User app (port 3001)
 │   ├── admin/        # Admin panel (port 3002)
 │   └── web/          # Public marketing site (port 3003)
 ├── layers/
@@ -57,19 +58,11 @@ nuxt-app/
 
 ## Quick start
 
-See [DOCKER.md](./DOCKER.md) for Compose commands, ports, and images.
+See [DOCKER.md](./DOCKER.md) for Compose commands and ports. Compose is Postgres + Redis only.
 
 ```bash
 cp .env.example .env
 pnpm docker:up
-```
-
-## Local development (apps on the host)
-
-Start Postgres and Redis with Compose (see [DOCKER.md](./DOCKER.md)), then:
-
-```bash
-cp .env.example .env
 pnpm install
 pnpm db:migrate
 pnpm dev
@@ -78,13 +71,13 @@ pnpm dev
 Or individually:
 
 ```bash
-pnpm dev:api        # http://localhost:3001
-pnpm dev:app        # http://localhost:3000
+pnpm dev:api        # http://localhost:3000
+pnpm dev:app        # http://localhost:3001
 pnpm dev:admin      # http://localhost:3002
 pnpm dev:web        # http://localhost:3003
 ```
 
-Env is shared from the repo-root `.env` (see `.env.example`). Seed and schema commands: [apps/api/README.md](apps/api/README.md).
+Env is shared from the repo-root `.env` (see `.env.example`). Schema and admin commands: [apps/api/README.md](apps/api/README.md).
 
 ## Lint
 

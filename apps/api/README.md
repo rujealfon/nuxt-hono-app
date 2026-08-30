@@ -1,6 +1,6 @@
 # API (`@nuxt-app/api`)
 
-Hono server for auth, sessions, and the public HTTP API. Production host: `api.nuxt-app.com`. Local: http://localhost:3001.
+Hono server for auth, sessions, and the public HTTP API. Production host: `api.nuxt-app.com`. Local: http://localhost:3000.
 
 Install and env live at the repo root. From the monorepo:
 
@@ -10,8 +10,8 @@ pnpm db:migrate
 pnpm dev:api
 ```
 
-Scalar (development only): http://localhost:3001/docs  
-OpenAPI spec: http://localhost:3001/openapi.json
+Scalar (development only): http://localhost:3000/docs  
+OpenAPI spec: http://localhost:3000/openapi.json
 
 ## Endpoints
 
@@ -39,10 +39,10 @@ pnpm db:studio
 
 Migrations also run on API boot (`src/index.ts`) and on every Vercel API build (`pnpm db:migrate`). Preview must use its own database. See [VERCEL.md](../../VERCEL.md).
 
-Seed an admin (`ADMIN_PASSWORD` is required). Optional: `ADMIN_EMAIL` (default `admin@nuxt-app.com`), `ADMIN_NAME`.
+Create or promote an admin (`ADMIN_PASSWORD` is required). Optional: `ADMIN_EMAIL` (default `admin@nuxt-app.com`), `ADMIN_NAME`. If that email already exists, the password is reset and the user is promoted to admin.
 
 ```bash
-ADMIN_PASSWORD='your-strong-password' pnpm db:seed
+ADMIN_PASSWORD='your-strong-password' pnpm db:ensure-admin
 ```
 
 Or register, then:
@@ -78,4 +78,4 @@ Neon connection strings use `sslmode=verify-full`.
 
 ## Deploy
 
-Vercel project `nuxt-app-api`. Entry is the `dist/vercel/app.js` bundle (not `tsc`). Details: [VERCEL.md](../../VERCEL.md). Compose: [DOCKER.md](../../DOCKER.md).
+Vercel project `nuxt-app-api`. Entry is the `dist/vercel/app.js` bundle (not `tsc`). Details: [VERCEL.md](../../VERCEL.md). Local Postgres/Redis: [DOCKER.md](../../DOCKER.md).

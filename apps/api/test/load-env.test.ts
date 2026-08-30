@@ -18,7 +18,7 @@ describe('loadEnv', () => {
 
 describe('env', () => {
   it('uses the root .env APP_URL when present', () => {
-    expect(env.APP_URL).toBe(process.env.APP_URL ?? 'http://localhost:3000')
+    expect(env.APP_URL).toBe(process.env.APP_URL ?? 'http://localhost:3001')
   })
 
   it('parses DATABASE_URL in the typed settings', () => {

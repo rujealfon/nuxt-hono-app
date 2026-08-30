@@ -7,8 +7,8 @@ describe('web landing page', () => {
     const wrapper = await mountSuspended(IndexPage)
 
     expect(wrapper.get('h1').text()).toBe('Build something great')
-    expect(wrapper.get('a[href="http://localhost:3000/login"]').text()).toBe('Login')
-    expect(wrapper.get('a[href="http://localhost:3000/register"]').text()).toContain('Get started')
+    expect(wrapper.get('a[href="http://localhost:3001/login"]').text()).toBe('Login')
+    expect(wrapper.get('a[href="http://localhost:3001/register"]').text()).toContain('Get started')
     expect(wrapper.text()).toContain('Start free')
   })
 })
