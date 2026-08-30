@@ -9,7 +9,7 @@ pnpm install
 pnpm dev:admin
 ```
 
-Needs the API on http://localhost:3001 (`pnpm dev:api` or Compose). Seed an admin first — see [apps/api/README.md](../api/README.md).
+Needs the API on http://localhost:3001 (`pnpm dev:api`). Seed an admin first — see [apps/api/README.md](../api/README.md).
 
 ## Routes
 
@@ -34,4 +34,4 @@ From the repo-root `.env`. `ADMIN_URL` is this app’s public origin (CORS + coo
 
 ## Deploy
 
-Vercel project `nuxt-app-admin` (`nuxt build`). Details: [VERCEL.md](../../VERCEL.md). Compose: [DOCKER.md](../../DOCKER.md).
+Vercel project `nuxt-app-admin` (`nuxt build`). Details: [VERCEL.md](../../VERCEL.md). Local Postgres/Redis: [DOCKER.md](../../DOCKER.md).

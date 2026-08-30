@@ -9,7 +9,7 @@ pnpm install
 pnpm dev:app
 ```
 
-Needs the API on http://localhost:3001 (`pnpm dev:api` or Compose).
+Needs the API on http://localhost:3001 (`pnpm dev:api`).
 
 ## Routes
 
@@ -35,4 +35,4 @@ From the repo-root `.env`. `NUXT_PUBLIC_API_URL` is the API the client talks to 
 
 ## Deploy
 
-Vercel project `nuxt-app-app` (`nuxt build`). Details: [VERCEL.md](../../VERCEL.md). Compose: [DOCKER.md](../../DOCKER.md).
+Vercel project `nuxt-app-app` (`nuxt build`). Details: [VERCEL.md](../../VERCEL.md). Local Postgres/Redis: [DOCKER.md](../../DOCKER.md).

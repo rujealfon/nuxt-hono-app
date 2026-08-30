@@ -17,10 +17,8 @@ pnpm db:studio        # drizzle-kit studio on the host
 pnpm db:seed          # seed an admin user (requires ADMIN_PASSWORD), tsx apps/api/src/seed.ts
 ```
 
-Docker: [DOCKER.md](DOCKER.md) (`pnpm docker:up`, ports, images, Postgres 5433, Redis 6380).
+Docker: [DOCKER.md](DOCKER.md) (local Postgres 5433 + Redis 6380 only, not production). Then `pnpm install`, `pnpm db:migrate`, `pnpm dev`. `.env.example` already uses those published ports.
 Vercel: [VERCEL.md](VERCEL.md) (four projects: `nuxt-app-web`, `nuxt-app-app`, `nuxt-app-admin`, `nuxt-app-api`; env, domains, migrate).
-
-Local host apps: Compose Postgres + Redis (see [DOCKER.md](DOCKER.md)), then `pnpm install`, `pnpm db:migrate`, `pnpm dev`. `.env.example` points `DATABASE_URL` at Compose’s published Postgres port (5433).
 
 ## Git
 

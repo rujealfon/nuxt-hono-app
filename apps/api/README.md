@@ -78,4 +78,4 @@ Neon connection strings use `sslmode=verify-full`.
 
 ## Deploy
 
-Vercel project `nuxt-app-api`. Entry is the `dist/vercel/app.js` bundle (not `tsc`). Details: [VERCEL.md](../../VERCEL.md). Compose: [DOCKER.md](../../DOCKER.md).
+Vercel project `nuxt-app-api`. Entry is the `dist/vercel/app.js` bundle (not `tsc`). Details: [VERCEL.md](../../VERCEL.md). Local Postgres/Redis: [DOCKER.md](../../DOCKER.md).

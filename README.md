@@ -25,7 +25,8 @@ pnpm + Turborepo. Four deployables, shared Nuxt layers, and shared TS packages.
 - **API**: Hono
 - **Auth**: Session cookie (`nuxt_app_session`), not JWTs
 - **DB**: PostgreSQL via Drizzle (Neon in production, `sslmode=verify-full`)
-- **Runtime**: Docker Compose (Postgres + Redis + all apps)
+- **Local data**: Docker Compose (Postgres + Redis); apps on the host via `pnpm dev`
+- **Deploy**: Vercel (Neon Postgres, Upstash Redis)
 - **Rate limit**: `redis` (node-redis) + `hono-rate-limiter` (in-memory in tests). Production: [Upstash Redis](https://upstash.com/docs/redis) over `rediss://`
 - **Jobs**: [Upstash QStash](https://upstash.com/docs/qstash)
 - **Object storage**: [Cloudflare R2](https://developers.cloudflare.com/r2/)
@@ -57,19 +58,11 @@ nuxt-app/
 
 ## Quick start
 
-See [DOCKER.md](./DOCKER.md) for Compose commands, ports, and images.
+See [DOCKER.md](./DOCKER.md) for Compose commands and ports. Compose is Postgres + Redis only.
 
 ```bash
 cp .env.example .env
 pnpm docker:up
-```
-
-## Local development (apps on the host)
-
-Start Postgres and Redis with Compose (see [DOCKER.md](./DOCKER.md)), then:
-
-```bash
-cp .env.example .env
 pnpm install
 pnpm db:migrate
 pnpm dev

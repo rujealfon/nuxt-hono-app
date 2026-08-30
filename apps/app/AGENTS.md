@@ -12,7 +12,7 @@ pnpm --filter @nuxt-app/app test -- -t "shows the signed-in user"   # single tes
 pnpm --filter @nuxt-app/app type-check
 ```
 
-Needs a running API (`pnpm dev:api` or Compose).
+Needs a running API (`pnpm dev:api`).
 
 ## Feature layout
 

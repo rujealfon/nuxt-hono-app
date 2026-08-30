@@ -26,15 +26,13 @@
     "predocker:up": "bash scripts/ensure-docker-env.sh",
     "predocker:rebuild": "bash scripts/ensure-docker-env.sh",
     "predocker:reset": "bash scripts/ensure-docker-env.sh",
-    "docker:up": "docker compose up -d --wait",
+    "docker:up": "docker compose up -d --wait --remove-orphans",
     "docker:down": "docker compose down",
     "docker:start": "docker compose start",
     "docker:stop": "docker compose stop",
     "docker:restart": "docker compose restart",
-    "docker:rebuild": "docker compose up --build -d --wait",
-    "docker:reset": "docker compose down -v && docker compose up --build -d --wait",
-    "docker:db:migrate": "docker compose exec api pnpm db:migrate",
-    "docker:db:seed": "docker compose exec -e ADMIN_PASSWORD -e ADMIN_EMAIL -e ADMIN_NAME api pnpm db:seed",
+    "docker:rebuild": "docker compose pull && docker compose up -d --wait --remove-orphans",
+    "docker:reset": "docker compose down -v && docker compose up -d --wait --remove-orphans",
     "prepare": "husky"
   },
   "devDependencies": {
