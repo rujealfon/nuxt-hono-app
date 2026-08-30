@@ -1,7 +1,7 @@
 import type { Context } from 'hono'
 import { allowedOrigins } from '#api/env.js'
 
-const fallbackOrigin = allowedOrigins[0] ?? 'http://localhost:3000'
+const fallbackOrigin = allowedOrigins[0] ?? 'http://localhost:3001'
 
 export function resolveCorsOrigin(origin: string): string {
   if (origin && allowedOrigins.includes(origin))

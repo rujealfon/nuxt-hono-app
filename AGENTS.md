@@ -5,7 +5,7 @@ This file provides guidance when working with code in this repository.
 ## Commands
 
 ```bash
-pnpm dev              # all apps via Turborepo (api:3001, app:3000, admin:3002, web:3003)
+pnpm dev              # all apps via Turborepo (api:3000, app:3001, admin:3002, web:3003)
 pnpm dev:api          # single app: turbo run dev --filter=@nuxt-app/api (also dev:app, dev:admin, dev:web)
 pnpm build            # turbo run build (respects dependsOn: ["^build"])
 pnpm type-check       # turbo run type-check (every workspace: tsc or nuxt typecheck)

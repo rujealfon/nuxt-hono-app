@@ -8,7 +8,7 @@ loadRootEnv()
 
 const apiUrl = parsePublicUrl(
   process.env.NUXT_PUBLIC_API_URL || resolveVercelPreviewUrl('nuxt-app-api'),
-  'http://localhost:3001',
+  'http://localhost:3000',
 )
 
 export default defineNuxtConfig({

@@ -5,7 +5,7 @@ Hono server. Repo-root `AGENTS.md` covers monorepo commands, shared imports, and
 ## Commands
 
 ```bash
-pnpm dev:api                         # tsx watch, http://localhost:3001
+pnpm dev:api                         # tsx watch, http://localhost:3000
 pnpm --filter @nuxt-app/api test     # vitest, app.request(), db nuxt_app_db_test
 pnpm --filter @nuxt-app/api test -- sessions.test.ts   # single file
 pnpm --filter @nuxt-app/api test -- -t "sweeps expired sessions when logging in"   # single test by name
@@ -14,7 +14,7 @@ pnpm db:migrate                      # also runs on boot in src/index.ts and on 
 pnpm db:ensure-admin                 # create/promote an admin; ADMIN_PASSWORD required
 ```
 
-Scalar is at http://localhost:3001/docs when `NODE_ENV=development`. Spec: `/openapi.json` (generated from routes).
+Scalar is at http://localhost:3000/docs when `NODE_ENV=development`. Spec: `/openapi.json` (generated from routes).
 
 ## Architecture
 

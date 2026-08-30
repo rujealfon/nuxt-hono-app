@@ -123,8 +123,8 @@ describe('envSchema', () => {
       DATABASE_URL: 'postgres://user:pass@localhost:5432/database',
     })
 
-    expect(result.API_URL).toBe('http://localhost:3001')
-    expect(result.APP_URL).toBe('http://localhost:3000')
+    expect(result.API_URL).toBe('http://localhost:3000')
+    expect(result.APP_URL).toBe('http://localhost:3001')
     expect(result.ADMIN_URL).toBe('http://localhost:3002')
     expect(result.WEB_URL).toBe('http://localhost:3003')
     expect(result.REDIS_URL).toBe('redis://localhost:6380')

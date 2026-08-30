@@ -37,8 +37,8 @@ pnpm + Turborepo. Four deployables, shared Nuxt layers, and shared TS packages.
 ```
 nuxt-app/
 ├── apps/
-│   ├── api/          # Hono backend (port 3001)
-│   ├── app/          # User app (port 3000)
+│   ├── api/          # Hono backend (port 3000)
+│   ├── app/          # User app (port 3001)
 │   ├── admin/        # Admin panel (port 3002)
 │   └── web/          # Public marketing site (port 3003)
 ├── layers/
@@ -71,8 +71,8 @@ pnpm dev
 Or individually:
 
 ```bash
-pnpm dev:api        # http://localhost:3001
-pnpm dev:app        # http://localhost:3000
+pnpm dev:api        # http://localhost:3000
+pnpm dev:app        # http://localhost:3001
 pnpm dev:admin      # http://localhost:3002
 pnpm dev:web        # http://localhost:3003
 ```

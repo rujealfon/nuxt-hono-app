@@ -14,15 +14,15 @@ pnpm dev
 
 | Service        | URL                                |
 | -------------- | ---------------------------------- |
-| App            | http://localhost:3000 (`pnpm dev`) |
-| API            | http://localhost:3001 (`pnpm dev`) |
+| App            | http://localhost:3001 (`pnpm dev`) |
+| API            | http://localhost:3000 (`pnpm dev`) |
 | Admin          | http://localhost:3002 (`pnpm dev`) |
 | Web            | http://localhost:3003 (`pnpm dev`) |
 | Postgres       | localhost:5433 (container 5432)    |
 | Redis          | localhost:6380 (container 6379)    |
 | Drizzle Studio | http://127.0.0.1:4983              |
 
-The API runs Drizzle migrations on boot as well. Scalar is at http://localhost:3001/docs (`NODE_ENV=development`). Create an admin (`ADMIN_PASSWORD` is required):
+The API runs Drizzle migrations on boot as well. Scalar is at http://localhost:3000/docs (`NODE_ENV=development`). Create an admin (`ADMIN_PASSWORD` is required):
 
 ```bash
 ADMIN_PASSWORD='your-strong-password' pnpm db:ensure-admin

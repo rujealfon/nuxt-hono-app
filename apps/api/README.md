@@ -1,6 +1,6 @@
 # API (`@nuxt-app/api`)
 
-Hono server for auth, sessions, and the public HTTP API. Production host: `api.nuxt-app.com`. Local: http://localhost:3001.
+Hono server for auth, sessions, and the public HTTP API. Production host: `api.nuxt-app.com`. Local: http://localhost:3000.
 
 Install and env live at the repo root. From the monorepo:
 
@@ -10,8 +10,8 @@ pnpm db:migrate
 pnpm dev:api
 ```
 
-Scalar (development only): http://localhost:3001/docs  
-OpenAPI spec: http://localhost:3001/openapi.json
+Scalar (development only): http://localhost:3000/docs  
+OpenAPI spec: http://localhost:3000/openapi.json
 
 ## Endpoints
 

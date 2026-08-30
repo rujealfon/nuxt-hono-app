@@ -1,6 +1,6 @@
 # App (`@nuxt-app/app`)
 
-Authenticated product SPA (Nuxt 4, `ssr: false`). Production host: `app.nuxt-app.com`. Local: http://localhost:3000.
+Authenticated product SPA (Nuxt 4, `ssr: false`). Production host: `app.nuxt-app.com`. Local: http://localhost:3001.
 
 Extends `@nuxt-app/layer-base` and `@nuxt-app/layer-auth`. Install and env live at the repo root.
 
@@ -9,7 +9,7 @@ pnpm install
 pnpm dev:app
 ```
 
-Needs the API on http://localhost:3001 (`pnpm dev:api`).
+Needs the API on http://localhost:3000 (`pnpm dev:api`).
 
 ## Routes
 
