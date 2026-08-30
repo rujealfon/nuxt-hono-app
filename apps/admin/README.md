@@ -9,7 +9,7 @@ pnpm install
 pnpm dev:admin
 ```
 
-Needs the API on http://localhost:3001 (`pnpm dev:api`). Seed an admin first — see [apps/api/README.md](../api/README.md).
+Needs the API on http://localhost:3001 (`pnpm dev:api`). Create an admin first — see [apps/api/README.md](../api/README.md).
 
 ## Routes
 

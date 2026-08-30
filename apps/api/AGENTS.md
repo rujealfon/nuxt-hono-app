@@ -11,7 +11,7 @@ pnpm --filter @nuxt-app/api test -- sessions.test.ts   # single file
 pnpm --filter @nuxt-app/api test -- -t "sweeps expired sessions when logging in"   # single test by name
 pnpm db:generate                     # after editing src/db/schema/
 pnpm db:migrate                      # also runs on boot in src/index.ts and on Vercel API builds (production and preview)
-pnpm db:seed                         # ADMIN_PASSWORD required
+pnpm db:ensure-admin                 # create/promote an admin; ADMIN_PASSWORD required
 ```
 
 Scalar is at http://localhost:3001/docs when `NODE_ENV=development`. Spec: `/openapi.json` (generated from routes).

@@ -77,7 +77,7 @@ pnpm dev:admin      # http://localhost:3002
 pnpm dev:web        # http://localhost:3003
 ```
 
-Env is shared from the repo-root `.env` (see `.env.example`). Seed and schema commands: [apps/api/README.md](apps/api/README.md).
+Env is shared from the repo-root `.env` (see `.env.example`). Schema and admin commands: [apps/api/README.md](apps/api/README.md).
 
 ## Lint
 

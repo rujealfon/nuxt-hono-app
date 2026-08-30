@@ -11,7 +11,7 @@ pnpm --filter @nuxt-app/admin test -- -t "shows the admin home for an administra
 pnpm --filter @nuxt-app/admin type-check
 ```
 
-Needs a running API (`pnpm dev:api`) and an admin user (`pnpm db:seed`).
+Needs a running API (`pnpm dev:api`) and an admin user (`pnpm db:ensure-admin`).
 
 ## Feature layout
 

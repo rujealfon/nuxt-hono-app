@@ -14,7 +14,7 @@ pnpm test             # turbo run test (API, Nuxt apps/layers, packages)
 pnpm db:generate      # drizzle-kit generate (run after editing apps/api/src/db/schema/)
 pnpm db:migrate       # applies migrations (API boot locally; production and preview Vercel API builds)
 pnpm db:studio        # drizzle-kit studio on the host
-pnpm db:seed          # seed an admin user (requires ADMIN_PASSWORD), tsx apps/api/src/seed.ts
+pnpm db:ensure-admin  # create/promote an admin (requires ADMIN_PASSWORD), tsx apps/api/src/ensure-admin.ts
 ```
 
 Docker: [DOCKER.md](DOCKER.md) (local Postgres 5433, Redis 6380, Drizzle Studio 4983; not production). Then `pnpm install`, `pnpm db:migrate`, `pnpm dev`. `.env.example` already uses those published ports.

@@ -22,10 +22,10 @@ pnpm dev
 | Redis          | localhost:6380 (container 6379)    |
 | Drizzle Studio | http://127.0.0.1:4983              |
 
-The API runs Drizzle migrations on boot as well. Scalar is at http://localhost:3001/docs (`NODE_ENV=development`). Seed an admin user (`ADMIN_PASSWORD` is required):
+The API runs Drizzle migrations on boot as well. Scalar is at http://localhost:3001/docs (`NODE_ENV=development`). Create an admin (`ADMIN_PASSWORD` is required):
 
 ```bash
-ADMIN_PASSWORD='your-strong-password' pnpm db:seed
+ADMIN_PASSWORD='your-strong-password' pnpm db:ensure-admin
 ```
 
 Drizzle Studio starts with Compose. Schema is bind-mounted, so `src/db` edits show up without rebuilding. Host fallback (do not run both — same port): `pnpm db:studio`.
@@ -40,7 +40,7 @@ Drizzle Studio starts with Compose. Schema is bind-mounted, so `src/db` edits sh
 | `pnpm docker:down`                       | Stop and remove containers                                          |
 | `pnpm docker:start` / `stop` / `restart` | Existing containers                                                 |
 
-Migrate and seed on the host: `pnpm db:migrate`, `pnpm db:seed`.
+Migrate and create an admin on the host: `pnpm db:migrate`, `pnpm db:ensure-admin`.
 
 ## Images
 

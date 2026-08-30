@@ -22,7 +22,7 @@
     "db:check": "pnpm --filter @nuxt-app/api db:check",
     "db:migrate": "pnpm --filter @nuxt-app/api db:migrate",
     "db:studio": "pnpm --filter @nuxt-app/api db:studio",
-    "db:seed": "pnpm --filter @nuxt-app/api db:seed",
+    "db:ensure-admin": "pnpm --filter @nuxt-app/api db:ensure-admin",
     "predocker:up": "bash scripts/ensure-docker-env.sh",
     "predocker:rebuild": "bash scripts/ensure-docker-env.sh",
     "predocker:reset": "bash scripts/ensure-docker-env.sh",
