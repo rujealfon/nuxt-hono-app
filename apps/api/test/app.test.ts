@@ -141,7 +141,7 @@ describe('api', () => {
       method: 'POST',
       headers: {
         Cookie: cookie,
-        Origin: 'http://localhost:3000',
+        Origin: 'http://localhost:3001',
       },
     })
     expect(logout.res.status).toBe(200)

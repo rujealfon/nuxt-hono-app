@@ -5,14 +5,14 @@ Authenticated product SPA (`ssr: false`). Extends `layer-auth` + `layer-base`. R
 ## Commands
 
 ```bash
-pnpm dev:app                         # http://localhost:3000
+pnpm dev:app                         # http://localhost:3001
 pnpm --filter @nuxt-app/app test     # @nuxt/test-utils + Vitest; component tests colocated as *.test.ts, route/page tests under test/
 pnpm --filter @nuxt-app/app test -- HomeWelcomeCard.test.ts   # single file
 pnpm --filter @nuxt-app/app test -- -t "shows the signed-in user"   # single test by name
 pnpm --filter @nuxt-app/app type-check
 ```
 
-Needs a running API (`pnpm dev:api` or Compose).
+Needs a running API (`pnpm dev:api`).
 
 ## Feature layout
 

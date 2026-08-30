@@ -186,7 +186,7 @@ DATABASE_URL_UNPOOLED='postgresql://USER:PASSWORD@ep-xxx.region.aws.neon.tech:54
 
 DATABASE_URL='postgresql://USER:PASSWORD@ep-xxx.region.aws.neon.tech:5432/neondb?sslmode=verify-full' \
   ADMIN_PASSWORD='your-strong-password' \
-  pnpm db:seed
+  pnpm db:ensure-admin
 ```
 
 `drizzle-kit` / `tsx` do not load Vercel env files. Pass `DATABASE_URL_UNPOOLED` on the command line for migrate/studio.
@@ -206,7 +206,7 @@ pnpm db:migrate
 
 1. API (env vars set).
 2. `https://<api>/health`.
-3. Confirm the API build applied migrations (`Running migrations...` / `Migrations completed.`). Seed if the database is new.
+3. Confirm the API build applied migrations (`Running migrations...` / `Migrations completed.`). Create an admin if the database is new (`pnpm db:ensure-admin`).
 4. app, admin, web.
 
 Git pushes then deploy all four. Vercel skips a project when that package and its workspace deps did not change.
@@ -217,7 +217,7 @@ Git pushes then deploy all four. Vercel skips a project when that package and it
 2. Open app `/register` → create a user → lands on `/login` (register does not start a session).
 3. Sign in with that account → lands logged in.
 4. `GET https://<api>/v1/auth/me` in that browser session returns the user (`nuxt_app_session`, httpOnly).
-5. Open admin → same cookie works on `*.nuxt-app.com` with `COOKIE_DOMAIN` set. Promote with `ADMIN_PASSWORD=... pnpm db:seed` (resets that account's password) or `UPDATE users SET role = 'admin' …`.
+5. Open admin → same cookie works on `*.nuxt-app.com` with `COOKIE_DOMAIN` set. Promote with `ADMIN_PASSWORD=... pnpm db:ensure-admin` (resets that account's password) or `UPDATE users SET role = 'admin' …`.
 6. Wrong-origin request to the API is rejected (CORS/CSRF).
 7. Hit login ~11 times quickly → 429 from the Redis limiter.
 

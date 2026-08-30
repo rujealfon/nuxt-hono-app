@@ -2,8 +2,8 @@ import { eq } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
 import app from '#api/app.js'
 import { db, users } from '#api/db/index.js'
+import { ensureAdminFromEnv, resolveAdminEmail, resolveAdminPassword } from '#api/ensure-admin.js'
 import { createUser } from '#api/modules/auth/identity.js'
-import { resolveAdminSeedEmail, resolveAdminSeedPassword, seed } from '#api/seed.js'
 
 async function login(email: string, password: string) {
   return app.request('/v1/auth/login', {
@@ -25,48 +25,48 @@ function sessionCookie(res: Response): string | undefined {
   return header?.split(';')[0]
 }
 
-describe('resolveAdminSeedPassword', () => {
+describe('resolveAdminPassword', () => {
   it('rejects a missing password', () => {
-    expect(() => resolveAdminSeedPassword({})).toThrow(/ADMIN_PASSWORD is required/)
+    expect(() => resolveAdminPassword({})).toThrow(/ADMIN_PASSWORD is required/)
   })
 
   it('rejects a whitespace-only password', () => {
-    expect(() => resolveAdminSeedPassword({ ADMIN_PASSWORD: '   ' })).toThrow(/ADMIN_PASSWORD is required/)
+    expect(() => resolveAdminPassword({ ADMIN_PASSWORD: '   ' })).toThrow(/ADMIN_PASSWORD is required/)
   })
 
   it('rejects a short password', () => {
-    expect(() => resolveAdminSeedPassword({ ADMIN_PASSWORD: 'short' })).toThrow(
+    expect(() => resolveAdminPassword({ ADMIN_PASSWORD: 'short' })).toThrow(
       'Password must be at least 8 characters',
     )
   })
 
   it('returns an explicit password', () => {
-    expect(resolveAdminSeedPassword({ ADMIN_PASSWORD: 'correct-horse' })).toBe('correct-horse')
+    expect(resolveAdminPassword({ ADMIN_PASSWORD: 'correct-horse' })).toBe('correct-horse')
   })
 
   it('preserves leading and trailing spaces', () => {
-    expect(resolveAdminSeedPassword({ ADMIN_PASSWORD: '  correct-horse  ' })).toBe('  correct-horse  ')
+    expect(resolveAdminPassword({ ADMIN_PASSWORD: '  correct-horse  ' })).toBe('  correct-horse  ')
   })
 })
 
-describe('resolveAdminSeedEmail', () => {
+describe('resolveAdminEmail', () => {
   it('defaults to the documented admin address', () => {
-    expect(resolveAdminSeedEmail({})).toBe('admin@nuxt-app.com')
+    expect(resolveAdminEmail({})).toBe('admin@nuxt-app.com')
   })
 
   it('trims whitespace and lowercases', () => {
-    expect(resolveAdminSeedEmail({ ADMIN_EMAIL: '  Admin@Nuxt-App.COM  ' })).toBe('admin@nuxt-app.com')
+    expect(resolveAdminEmail({ ADMIN_EMAIL: '  Admin@Nuxt-App.COM  ' })).toBe('admin@nuxt-app.com')
   })
 
   it('rejects a malformed email', () => {
-    expect(() => resolveAdminSeedEmail({ ADMIN_EMAIL: 'not-an-email' })).toThrow('Invalid email')
+    expect(() => resolveAdminEmail({ ADMIN_EMAIL: 'not-an-email' })).toThrow('Invalid email')
   })
 })
 
-describe('seed', () => {
+describe('ensureAdminFromEnv', () => {
   it('does not create an admin when ADMIN_PASSWORD is unset', async () => {
-    const email = `seed-${Date.now()}@nuxt-app.com`
-    await expect(seed({ ADMIN_EMAIL: email, ADMIN_NAME: 'Admin' })).rejects.toThrow(
+    const email = `admin-${Date.now()}@nuxt-app.com`
+    await expect(ensureAdminFromEnv({ ADMIN_EMAIL: email, ADMIN_NAME: 'Admin' })).rejects.toThrow(
       /ADMIN_PASSWORD is required/,
     )
 
@@ -74,8 +74,8 @@ describe('seed', () => {
   })
 
   it('creates an admin when ADMIN_PASSWORD is set', async () => {
-    const email = `seed-ok-${Date.now()}@nuxt-app.com`
-    await seed({
+    const email = `admin-ok-${Date.now()}@nuxt-app.com`
+    await ensureAdminFromEnv({
       ADMIN_EMAIL: email,
       ADMIN_NAME: 'Admin',
       ADMIN_PASSWORD: 'unique-pass-99',
@@ -87,10 +87,10 @@ describe('seed', () => {
   })
 
   it('does not promote a pre-existing account when ADMIN_PASSWORD is unset', async () => {
-    const email = `seed-pre-${Date.now()}@nuxt-app.com`
+    const email = `admin-pre-${Date.now()}@nuxt-app.com`
     await createUser({ email, password: 'attacker-pass', name: 'Pre' })
 
-    await expect(seed({ ADMIN_EMAIL: email, ADMIN_NAME: 'Admin' })).rejects.toThrow(
+    await expect(ensureAdminFromEnv({ ADMIN_EMAIL: email, ADMIN_NAME: 'Admin' })).rejects.toThrow(
       /ADMIN_PASSWORD is required/,
     )
 
@@ -100,7 +100,7 @@ describe('seed', () => {
   })
 
   it('resets the password and sessions when promoting a pre-existing account', async () => {
-    const email = `seed-takeover-${Date.now()}@nuxt-app.com`
+    const email = `admin-takeover-${Date.now()}@nuxt-app.com`
     await createUser({ email, password: 'attacker-pass', name: 'Pre' })
     const loggedIn = await login(email, 'attacker-pass')
     const cookie = sessionCookie(loggedIn)
@@ -109,7 +109,7 @@ describe('seed', () => {
       user: { email, role: 'user' },
     })
 
-    await seed({
+    await ensureAdminFromEnv({
       ADMIN_EMAIL: email,
       ADMIN_NAME: 'Admin',
       ADMIN_PASSWORD: 'operator-pass-99',
@@ -125,11 +125,11 @@ describe('seed', () => {
   })
 
   it('finds an existing user when ADMIN_EMAIL differs only by case', async () => {
-    const local = `seed-case-${Date.now()}`
+    const local = `admin-case-${Date.now()}`
     const email = `${local}@nuxt-app.com`
     await createUser({ email, password: 'attacker-pass', name: 'Pre' })
 
-    await seed({
+    await ensureAdminFromEnv({
       ADMIN_EMAIL: `${local.toUpperCase()}@Nuxt-App.COM`,
       ADMIN_NAME: 'Admin',
       ADMIN_PASSWORD: 'operator-pass-99',
@@ -140,11 +140,11 @@ describe('seed', () => {
     expect(body.user).toMatchObject({ email, role: 'admin' })
   })
 
-  it('leaves a usable admin if two seeds race on the same email', async () => {
-    const email = `seed-race-${Date.now()}@nuxt-app.com`
+  it('leaves a usable admin if two ensure-admin runs race on the same email', async () => {
+    const email = `admin-race-${Date.now()}@nuxt-app.com`
     await Promise.all([
-      seed({ ADMIN_EMAIL: email, ADMIN_NAME: 'Admin', ADMIN_PASSWORD: 'password-aaa' }),
-      seed({ ADMIN_EMAIL: email, ADMIN_NAME: 'Admin', ADMIN_PASSWORD: 'password-bbb' }),
+      ensureAdminFromEnv({ ADMIN_EMAIL: email, ADMIN_NAME: 'Admin', ADMIN_PASSWORD: 'password-aaa' }),
+      ensureAdminFromEnv({ ADMIN_EMAIL: email, ADMIN_NAME: 'Admin', ADMIN_PASSWORD: 'password-bbb' }),
     ])
 
     const matchesAaa = await loginJson(email, 'password-aaa')
@@ -155,7 +155,7 @@ describe('seed', () => {
   })
 
   it('does not create an admin when ADMIN_EMAIL is malformed', async () => {
-    await expect(seed({
+    await expect(ensureAdminFromEnv({
       ADMIN_EMAIL: 'not-an-email',
       ADMIN_NAME: 'Admin',
       ADMIN_PASSWORD: 'unique-pass-99',

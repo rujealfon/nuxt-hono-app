@@ -5,10 +5,7 @@
 **/.output
 **/dist
 **/node_modules
-**/*.db
-**/*.db-journal
 .env
 **/.env
 .DS_Store
 *.log
-apps/api/data

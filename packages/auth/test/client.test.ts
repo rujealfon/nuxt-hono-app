@@ -18,7 +18,7 @@ function jsonResponse(status: number, body: unknown) {
 
 describe('createAuthClient', () => {
   const fetchMock = vi.fn()
-  const authClient = createAuthClient('http://localhost:3001')
+  const authClient = createAuthClient('http://localhost:3000')
 
   beforeEach(() => {
     fetchMock.mockReset()
@@ -40,7 +40,7 @@ describe('createAuthClient', () => {
     expect(result.user).toEqual(user)
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
-    expect(String(url)).toContain('http://localhost:3001/v1/auth/login')
+    expect(String(url)).toContain('http://localhost:3000/v1/auth/login')
     expect(init.credentials).toBe('include')
     expect(init.redirect).toBe('manual')
     expect(init.method?.toUpperCase()).toBe('POST')
@@ -156,14 +156,14 @@ describe('createAuthClient', () => {
   it('keeps local host ports', async () => {
     fetchMock.mockResolvedValue(jsonResponse(200, { user }))
     const client = createAuthClient(
-      'http://localhost:3001',
-      'http://localhost:3000/login',
+      'http://localhost:3000',
+      'http://localhost:3001/login',
     )
 
     await client.me()
 
     const [url] = fetchMock.mock.calls[0] as [string]
-    expect(String(url)).toContain('http://localhost:3001/v1/auth/me')
+    expect(String(url)).toContain('http://localhost:3000/v1/auth/me')
   })
 
   it('returns the current user from me', async () => {

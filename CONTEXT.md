@@ -17,7 +17,7 @@ An opaque id stored in the `nuxt_app_session` cookie and a matching row. Login s
 _Avoid_: Token, JWT, auth ticket
 
 **Admin**:
-A user whose role is `admin`. Seed promotes an email to this role and revokes their sessions. Admin login does not start a Session for a non-admin.
+A user whose role is `admin`. `pnpm db:ensure-admin` promotes an email to this role and revokes their sessions. Admin login does not start a Session for a non-admin.
 _Avoid_: Superuser, operator
 
 **Route access**:

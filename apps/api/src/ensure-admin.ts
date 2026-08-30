@@ -1,18 +1,18 @@
 /* eslint-disable no-console */
 /**
- * Create an admin user.
- * Run: ADMIN_PASSWORD=... pnpm --filter @nuxt-app/api db:seed
+ * Create or promote an admin user (not a data dump).
+ * Run: ADMIN_PASSWORD=... pnpm db:ensure-admin
  */
 import process from 'node:process'
 import { registerSchema } from '@nuxt-app/types'
 import { pool } from '#api/db/index.js'
 import { ensureAdmin } from '#api/modules/auth/identity.js'
 
-export function resolveAdminSeedPassword(env: NodeJS.Dict<string> = process.env): string {
+export function resolveAdminPassword(env: NodeJS.Dict<string> = process.env): string {
   const password = env.ADMIN_PASSWORD
   if (!password?.trim()) {
     throw new Error(
-      'ADMIN_PASSWORD is required to seed an admin user. Set it explicitly, e.g. ADMIN_PASSWORD=... pnpm db:seed',
+      'ADMIN_PASSWORD is required to create or update an admin user. Set it explicitly, e.g. ADMIN_PASSWORD=... pnpm db:ensure-admin',
     )
   }
 
@@ -24,7 +24,7 @@ export function resolveAdminSeedPassword(env: NodeJS.Dict<string> = process.env)
   return parsed.data
 }
 
-export function resolveAdminSeedEmail(env: NodeJS.Dict<string> = process.env): string {
+export function resolveAdminEmail(env: NodeJS.Dict<string> = process.env): string {
   const email = (env.ADMIN_EMAIL?.trim() || 'admin@nuxt-app.com').toLowerCase()
   const parsed = registerSchema.shape.email.safeParse(email)
   if (!parsed.success) {
@@ -34,10 +34,10 @@ export function resolveAdminSeedEmail(env: NodeJS.Dict<string> = process.env): s
   return parsed.data
 }
 
-export async function seed(env: NodeJS.Dict<string> = process.env) {
-  const email = resolveAdminSeedEmail(env)
+export async function ensureAdminFromEnv(env: NodeJS.Dict<string> = process.env) {
+  const email = resolveAdminEmail(env)
   const name = env.ADMIN_NAME || 'Admin'
-  const password = resolveAdminSeedPassword(env)
+  const password = resolveAdminPassword(env)
 
   const result = await ensureAdmin({ email, password, name })
 
@@ -54,9 +54,9 @@ export async function seed(env: NodeJS.Dict<string> = process.env) {
   console.log(`User ${email} already exists; ${action}.`)
 }
 
-const invokedDirectly = process.argv[1]?.endsWith('seed.ts')
+const invokedDirectly = process.argv[1]?.endsWith('ensure-admin.ts')
 if (invokedDirectly) {
-  seed()
+  ensureAdminFromEnv()
     .then(() => pool.end())
     .catch((err) => {
       console.error(err)

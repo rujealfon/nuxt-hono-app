@@ -8,7 +8,7 @@ export const authKeys = {
 
 function runtimeAuthClient() {
   const config = useRuntimeConfig()
-  const apiUrl = String(config.public.apiUrl || 'http://localhost:3001')
+  const apiUrl = String(config.public.apiUrl || 'http://localhost:3000')
   const pageHref = import.meta.client ? window.location.href : undefined
   return createAuthClient(apiUrl, pageHref)
 }

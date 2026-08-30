@@ -33,4 +33,4 @@ From the repo-root `.env`. `WEB_URL` is this site’s public origin. `NUXT_PUBLI
 
 ## Deploy
 
-Vercel project `nuxt-app-web` (`nuxt generate`, output `.output/public`). Details: [VERCEL.md](../../VERCEL.md). Compose image is nginx + prerendered files: [DOCKER.md](../../DOCKER.md).
+Vercel project `nuxt-app-web` (`nuxt generate`, output `.output/public`). Details: [VERCEL.md](../../VERCEL.md). Local Postgres/Redis: [DOCKER.md](../../DOCKER.md).
