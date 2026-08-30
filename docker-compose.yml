@@ -1,4 +1,5 @@
-# Local data only. API, app, admin, and web run on the host (`pnpm dev`).
+# Local data: Postgres, Redis, Drizzle Studio.
+# API, app, admin, and web run on the host (`pnpm dev`).
 services:
   postgres:
     image: postgres:18-alpine
@@ -26,6 +27,22 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  drizzle-studio:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.drizzle-studio
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-nuxt_app_postgres_user}:${POSTGRES_PASSWORD:-nuxt_app_postgres_password}@postgres:5432/${POSTGRES_DB:-nuxt_app_db}
+    ports:
+      - '127.0.0.1:4983:4983'
+    volumes:
+      - ./apps/api/src/db:/repo/apps/api/src/db
+      - ./apps/api/drizzle.config.ts:/repo/apps/api/drizzle.config.ts
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:

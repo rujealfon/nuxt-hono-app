@@ -1,0 +1,11 @@
+.git
+.turbo
+**/.turbo
+**/.nuxt
+**/.output
+**/dist
+**/node_modules
+.env
+**/.env
+.DS_Store
+*.log

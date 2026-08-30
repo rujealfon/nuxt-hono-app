@@ -25,7 +25,7 @@ pnpm + Turborepo. Four deployables, shared Nuxt layers, and shared TS packages.
 - **API**: Hono
 - **Auth**: Session cookie (`nuxt_app_session`), not JWTs
 - **DB**: PostgreSQL via Drizzle (Neon in production, `sslmode=verify-full`)
-- **Local data**: Docker Compose (Postgres + Redis); apps on the host via `pnpm dev`
+- **Local data**: Docker Compose (Postgres + Redis + Drizzle Studio); apps on the host via `pnpm dev`
 - **Deploy**: Vercel (Neon Postgres, Upstash Redis)
 - **Rate limit**: `redis` (node-redis) + `hono-rate-limiter` (in-memory in tests). Production: [Upstash Redis](https://upstash.com/docs/redis) over `rediss://`
 - **Jobs**: [Upstash QStash](https://upstash.com/docs/qstash)

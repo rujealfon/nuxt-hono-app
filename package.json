@@ -31,8 +31,8 @@
     "docker:start": "docker compose start",
     "docker:stop": "docker compose stop",
     "docker:restart": "docker compose restart",
-    "docker:rebuild": "docker compose pull && docker compose up -d --wait --remove-orphans",
-    "docker:reset": "docker compose down -v && docker compose up -d --wait --remove-orphans",
+    "docker:rebuild": "docker compose pull postgres redis && docker compose up --build -d --wait --remove-orphans",
+    "docker:reset": "docker compose down -v && docker compose up --build -d --wait --remove-orphans",
     "prepare": "husky"
   },
   "devDependencies": {
