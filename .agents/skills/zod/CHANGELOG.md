@@ -2,6 +2,19 @@
 
 Versions here track this skill's own content (instructions and references), not the `zod` package version — see the [README](README.md#version) for which `zod` line this skill was last verified against.
 
+## 1.2.0 - 2026-09-01
+
+Docs-backed refresh against `zod` 4.5.4 and https://zod.dev/llms.txt.
+
+- AOT compilation: `z.compile()` / `import "zod/compile"` (compile last; apps not libraries; unsupported fallback).
+- `z.validate()` / `z.validateAsync()` for boolean-only checks.
+- `z.creditCard()`, `.exactPartial()` / `z.exactPartial()`, `z.deepPartial()`, `z.properties()`, `z.getDiscriminatedOption()`, `z.toZod<T>()`, runtime `z.input()` / `z.output()`, symbol keys, tuple `.partial()`.
+- Cyclical *data* on recursive schemas (Mini: `z.config({ memoizer: z.memoizer() })`).
+- Soundness: ISO datetime seconds required; string `.min()`/`.max()`/`.length()` count code points; record key schemas govern matching keys only.
+- JSON Schema: `unrepresentable` as a function; metadata wins over generated keywords.
+
+Won't add: ecosystem catalog, full library-authors guide, compile internals / Moltar / memory-footprint blog, locale inventory, `__proto__` stripping, `fromJSONSchema` draft-edge cases, `z.xor()` multi-match error, `.implement()` exposing the function schema.
+
 ## 1.1.0 - 2026-08-23
 
 Docs-backed refresh against `zod` 4.4.3 and https://zod.dev/llms.txt.

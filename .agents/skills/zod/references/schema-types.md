@@ -18,6 +18,7 @@
 - [Maps and sets](#maps-and-sets)
 - [Files](#files)
 - [Instanceof and property](#instanceof-and-property)
+- [Matching an existing type](#matching-an-existing-type)
 
 ## Primitives and coercion
 
@@ -85,6 +86,13 @@ z.string().toUpperCase();
 z.string().normalize();
 ```
 
+`.min()` / `.max()` / `.length()` count Unicode **code points**, not UTF-16 code units. Emoji outside the BMP count as one; combining marks and ZWJ sequences count as several.
+
+```typescript
+z.string().length(1).parse("😀");       // one code point, two UTF-16 units
+z.string().length(2).parse("e\u0301");  // "é" — e + combining acute
+```
+
 ## String formats
 
 Top-level format functions (preferred in v4 — see [migration-v3-to-v4.md](migration-v3-to-v4.md)):
@@ -104,12 +112,13 @@ z.jwt();
 z.nanoid();
 z.cuid();
 z.cuid2();
-z.ulid();
+z.ulid();       // first character must be 0–7 (48-bit timestamp)
 z.ipv4();
-z.ipv6();
+z.ipv6();       // address alphabet, not `new URL()`
 z.mac();
 z.cidrv4();
 z.cidrv6();
+z.creditCard(); // 12–19 digits, optional single spaces/hyphens, Luhn checksum (4.5+)
 z.hash("sha256"); // or "sha1" | "sha384" | "sha512" | "md5"
 z.iso.date();
 z.iso.time();
@@ -136,19 +145,22 @@ const httpUrl = z.url({
 });
 ```
 
-Use `{ normalize: true }` to overwrite the input with `new URL().href`'s normalized form.
+Use `{ normalize: true }` to overwrite the input with `new URL().href`'s normalized form. `z.httpUrl()` also enforces the RFC 1035 host length limits that `z.hostname()` uses.
 
 **Phone numbers**: `z.e164()` validates leading `+`, non-zero country code, 7–15 digits total. Zod does not provide fuzzier phone validation — layer a `.refine()` on top if you need it.
 
-**ISO datetimes**: regex-based, not a full date library, but convenient for input validation.
+**ISO datetimes**: regex-based, not a full date library. A `Z` or offset requires seconds (RFC 3339); `2020-01-01T06:15Z` is rejected unless you opt into minute precision.
 
 ```typescript
-z.iso.datetime();                     // no offset, no local (2020-01-01T06:15:00Z only)
-z.iso.datetime({ offset: true });     // allows +02:00 style offsets (not +02 or +0200)
-z.iso.datetime({ local: true });      // allows timezone-less datetimes, seconds optional
-z.iso.datetime({ precision: -1 });    // minute precision (no seconds)
+z.iso.datetime();                     // no offset, no local; seconds required (2020-01-01T06:15:00Z)
+z.iso.datetime({ offset: true });     // allows +02:00 style offsets (not +02 or +0200); seconds required
+z.iso.datetime({ local: true });      // timezone-less datetimes; seconds optional only on the unqualified form
+z.iso.datetime({ precision: -1 });    // minute precision (no seconds) — the way to accept 2020-01-01T06:15Z
 z.iso.datetime({ precision: 0 });     // second precision only
 z.iso.datetime({ precision: 3 });     // millisecond precision only
+
+// both second-or-more and minute precision:
+z.union([z.iso.datetime(), z.iso.datetime({ precision: -1 })]);
 
 z.iso.date();   // YYYY-MM-DD
 z.iso.time();   // HH:MM[:SS[.s+]], no offsets of any kind allowed
@@ -165,6 +177,13 @@ z.cidrv6().parse("2001:db8::/32");
 
 z.mac().parse("00:1A:2B:3C:4D:5E");       // colon-delimited by default
 z.mac({ delimiter: "-" }).parse("00-1A-2B-3C-4D-5E");
+```
+
+**Credit cards** (4.5+): 12–19 digits with a valid Luhn checksum. Issuer is not identified. Single spaces or hyphens between groups are allowed; repeated separators, surrounding whitespace, and dots are not.
+
+```typescript
+z.creditCard().parse("4111 1111 1111 1111"); // ✅
+z.creditCard().parse("4111111111111112");    // ❌ checksum
 ```
 
 **JWTs and hashes**:
@@ -351,8 +370,30 @@ Recipe.pick({ title: true });
 Recipe.omit({ id: true });
 Recipe.partial();                          // all fields optional
 Recipe.partial({ ingredients: true });     // only these fields optional
+Recipe.exactPartial();                     // 4.5+ — omit keys ok, explicit undefined fails (exactOptional per field)
 Recipe.required();                         // all fields required
 Recipe.required({ description: true });    // only these fields required
+```
+
+`.exactPartial()` is `.partial()` wrapping each field in `z.exactOptional()` instead of `z.optional()`. Zod Mini: `z.exactPartial(Recipe)`.
+
+`z.deepPartial(schema)` (4.5+) recurses through nested objects, arrays, tuples, unions, records, and wrappers. The source is unchanged and the result is still a `ZodObject` (`.shape` / `.extend()` keep working). A discriminated union degrades to a plain `z.union()` (an optional discriminator defeats lookup). Like `.partial()`, it throws on an object that already carries a `.refine()`.
+
+```typescript
+const Post = z.object({
+  title: z.string(),
+  author: z.object({ name: z.string(), email: z.string() }),
+});
+z.deepPartial(Post).parse({ author: {} }); // ✅
+```
+
+A shape can declare a **symbol key**. A `const` symbol infers as `unique symbol` and is required unless you `.partial()` it. Undeclared symbol keys are ignored (`z.looseObject()` will not pass them through; `z.strictObject()` will not flag them).
+
+```typescript
+const TAG = Symbol("tag");
+const schema = z.object({ name: z.string(), [TAG]: z.number() });
+schema.parse({ name: "alice", [TAG]: 42 }); // ✅
+schema.safeParse({ name: "alice" });        // ❌
 ```
 
 ## Recursive objects
@@ -368,7 +409,16 @@ const Category = z.object({
 });
 ```
 
-Mutually recursive types work the same way. All object APIs (`.pick()`, `.omit()`, `.required()`, `.partial()`, etc.) work as expected on recursive schemas. Passing cyclical *data* (not just a cyclical schema) into `.parse()` causes an infinite loop.
+Mutually recursive types work the same way. All object APIs (`.pick()`, `.omit()`, `.required()`, `.partial()`, etc.) work as expected on recursive schemas. Cyclical *data* is supported (4.5+); the output graph mirrors the input:
+
+```typescript
+const input: any = { name: "root", subcategories: [] };
+input.subcategories.push(input);
+const result = Category.parse(input);
+result.subcategories[0] === result; // true
+```
+
+Zod Mini needs `z.config({ memoizer: z.memoizer() })` **before** schemas are defined.
 
 **Circularity errors**: some recursive getters trigger `ts(7023)` ("implicitly has return type 'any'"). Fix with an explicit return type annotation on the getter:
 
@@ -400,6 +450,9 @@ const MyTuple = z.tuple([z.string(), z.number(), z.boolean()]);
 
 const variadicTuple = z.tuple([z.string()], z.number());
 // [string, ...number[]]
+
+z.tuple([z.string(), z.number()]).partial();
+// [(string | undefined)?, (number | undefined)?]
 ```
 
 ## Unions, XOR, discriminated unions, intersections
@@ -429,7 +482,7 @@ const MyResult = z.discriminatedUnion("status", [
 ]);
 ```
 
-Each branch's discriminator should be a `z.literal()`, `z.enum()`, `z.null()`, or `z.undefined()`.
+Each branch's discriminator should be a `z.literal()`, `z.enum()`, `z.null()`, or `z.undefined()`. `z.getDiscriminatedOption(union, tag)` (4.5+) returns that branch as-is (`.shape` still works); a tag the union does not declare is a TypeScript error.
 
 Intersections (`A & B`) are a logical AND. For merging two *object* schemas, prefer `A.extend(B.shape)` (or spread) over `z.intersection()` — the result stays a full object schema with `.pick()`/`.omit()`/etc, whereas `z.intersection()` returns a bare `ZodIntersection`.
 
@@ -448,7 +501,9 @@ const Keys = z.enum(["id", "name", "email"]).or(z.never());
 const Person = z.partialRecord(Keys, z.string()); // { id?: string; name?: string; email?: string }
 ```
 
-`z.looseRecord()` passes through keys that don't match the key schema instead of erroring — useful combined with `.and()` to model "known field + pattern properties":
+As of 4.5 a record's key schema governs only the keys that match it (like a TypeScript index signature), so intersecting an object with a pattern-keyed `z.record()` no longer rejects the object's own keys.
+
+`z.looseRecord()` still passes through keys that don't match the key schema — use it when unmatched extras should survive rather than error:
 
 ```typescript
 const schema = z.object({ name: z.string() })
@@ -493,3 +548,27 @@ const httpsOnly = z.instanceof(URL).check(
   z.property("protocol", z.literal("https:"))
 );
 ```
+
+`.properties({...})` (4.5+) checks several properties at once and narrows the inferred type. The underlying `z.properties()` is a standalone schema: it asserts in place and returns the same instance (no clone, prototypes survive). Transforms/defaults inside the shape are validated then discarded. Spreading into `.check()` works too: `z.instanceof(Response).check(...z.properties({ status: z.number().min(200) }))`.
+
+```typescript
+const okResponse = z.instanceof(Response).properties({
+  status: z.number().min(200).max(299),
+  redirected: z.literal(false),
+});
+```
+
+## Matching an existing type
+
+When a handwritten or generated type is already the source of truth, `z.toZod<T>()` (4.5+) checks that the schema's output type is **exactly** `T` and returns the schema unchanged. `satisfies z.ZodType<T>` only checks assignability — extra keys and `z.any()` slip through.
+
+```typescript
+type Player = { username: string; xp: number };
+
+const Player = z.toZod<Player>()(
+  z.object({ username: z.string(), xp: z.number() })
+);
+Player.shape.username; // ZodString
+```
+
+Default remains schema-first with `z.infer<>`. Use `z.toZod` only when the type already exists and must not drift.

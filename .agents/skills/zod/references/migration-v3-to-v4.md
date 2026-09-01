@@ -96,7 +96,7 @@ See [refinements-transforms.md](refinements-transforms.md) for more on this dist
 - **Defaults inside optional fields now apply.** `z.object({ a: z.string().default("tuna").optional() }).parse({})` yields `{ a: "tuna" }` in v4 (v3 left the key absent). Audit code that branches on key presence.
 - `.strict()`/`.passthrough()` deprecated (kept, not removed) in favor of `z.strictObject()`/`z.looseObject()`.
 - `.strip()` deprecated — it was always the default; use `z.object(A.shape)` to convert a strict schema to a regular one.
-- `.deepPartial()` **removed**, no direct replacement — it was flagged as an anti-pattern with implementation footguns.
+- `.deepPartial()` **method** removed in v4. As of 4.5 the replacement is the top-level function `z.deepPartial(schema)` (result stays a `ZodObject`). Do not restore the v3 method.
 - `z.any()`/`z.unknown()` fields are no longer implicitly optional: `z.object({ a: z.any() })` infers `{ a: any }` (not `{ a?: any }`), and as of 4.4.0 a missing key also fails at parse time (`{ a: undefined }` still passes).
 - `.merge()` deprecated in favor of `.extend()` (or spread syntax, which also has better `tsc` performance): `BaseSchema.merge(Other)` → `BaseSchema.extend(Other.shape)`.
 
