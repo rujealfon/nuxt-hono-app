@@ -210,12 +210,14 @@ describe('createAuthClient', () => {
     await expect(authClient.me()).rejects.toThrow('network down')
   })
 
-  it('throws when me returns a malformed user', async () => {
+  it('trusts the typed success body without runtime validation', async () => {
     fetchMock.mockResolvedValue(jsonResponse(200, {
       user: { ...user, role: 'nope' },
     }))
 
-    await expect(authClient.me()).rejects.toThrow('Invalid response')
+    await expect(authClient.me()).resolves.toEqual({
+      user: { ...user, role: 'nope' },
+    })
   })
 
   it('throws when the body is not JSON', async () => {

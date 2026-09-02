@@ -6,7 +6,7 @@ There is no `v2` today. This records the plan for when one becomes necessary, so
 
 ## Decision
 
-When a breaking change is needed, do a **full cutover**, not per-endpoint versioning: add a `v2` sub-router mounted alongside `v1` in `app.ts`, keep `v1` running for a deprecation window, and bump every path in `packages/types`' `authHttp` (and any sibling `*Http` client-path objects) to `v2/...` in one shot. Modules whose contract didn't change are mounted on _both_ `v1` and `v2` by reusing the same router instance — they are not duplicated into a `v2` copy.
+When a breaking change is needed, do a **full cutover**, not per-endpoint versioning: add a `v2` sub-router mounted alongside `v1` in `app.ts`, keep `v1` running for a deprecation window, and point the mount (and every module path in `packages/types`' `authHttp` and any sibling `*Http` objects) at `v2` in one shot — with `hono/client` the client's paths follow `AppType` automatically (see `docs/adr/0002-hono-client-rpc.md`). Modules whose contract didn't change are mounted on _both_ `v1` and `v2` by reusing the same router instance — they are not duplicated into a `v2` copy.
 
 ## Why full cutover, not per-module versioning
 

@@ -1,5 +1,3 @@
-import type { Hono } from 'hono'
-import type { AppEnv } from '#api/types.js'
 import { AUTH_MOUNT } from '@nuxt-app/types'
 import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
@@ -62,8 +60,10 @@ const v1 = createRouter()
   .route(AUTH_MOUNT, authRoutes)
   .route('/admin', adminRoutes)
 
-const app: Hono<AppEnv> = base
+const app = base
   .route('/', healthRoutes)
   .route('/v1', v1)
+
+export type AppType = typeof app
 
 export default app

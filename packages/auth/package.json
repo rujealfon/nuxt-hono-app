@@ -13,9 +13,11 @@
   },
   "dependencies": {
     "@nuxt-app/types": "workspace:*",
+    "hono": "^4.13.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@nuxt-app/api": "workspace:*",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
   }

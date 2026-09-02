@@ -7,6 +7,11 @@
   "imports": {
     "#api/*": "./src/*"
   },
+  "exports": {
+    "./app": {
+      "types": "./src/app.ts"
+    }
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
