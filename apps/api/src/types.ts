@@ -7,3 +7,6 @@ export interface AppEnv {
     logger: PinoLogger
   }
 }
+
+/** Routers mounted behind `requireAdmin`, which guarantees a signed-in admin. */
+export type AdminEnv = AppEnv & { Variables: { user: AuthUser } }

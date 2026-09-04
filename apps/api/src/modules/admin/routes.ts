@@ -1,3 +1,4 @@
+import type { AdminEnv } from '#api/types.js'
 import { createRoute, z } from '@hono/zod-openapi'
 import { authUserSchema } from '@nuxt-app/types'
 import * as HttpStatusCodes from 'stoker/http-status-codes'
@@ -32,10 +33,10 @@ const dashboard = createRoute({
   },
 })
 
-export const adminRoutes = createRouter()
+export const adminRoutes = createRouter<AdminEnv>()
   .openapi(dashboard, (c) => {
     return c.json({
       message: 'Welcome to admin dashboard',
-      user: c.get('user')!,
+      user: c.get('user'),
     }, HttpStatusCodes.OK)
   })

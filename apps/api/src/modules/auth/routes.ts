@@ -8,8 +8,8 @@ import createErrorSchema from 'stoker/openapi/schemas/create-error-schema'
 import createMessageObjectSchema from 'stoker/openapi/schemas/create-message-object'
 import { createRouter } from '#api/factory.js'
 import { authRateLimit } from '#api/middleware/rate-limit.js'
+import { attachSessionCookie, endSession } from '#api/modules/auth/cookies.js'
 import { createUser, signIn } from '#api/modules/auth/identity.js'
-import { attachSessionCookie, endSession } from '#api/modules/auth/session.js'
 
 const tags = ['Auth']
 
