@@ -22,6 +22,19 @@ z.encode(stringToDate, new Date("2024-01-15"));
 
 Reach for a codec instead of `.transform()` whenever the same schema needs to serialize data back to its original shape — a network boundary shared between client and server, or a form that needs to round-trip. A plain `.transform()` is one-directional; calling `.encode()` on a schema containing one throws a runtime error.
 
+## Runtime `z.input()` / `z.output()` (4.5+)
+
+Distinct from the type helpers `z.input<typeof schema>` / `z.output<typeof schema>`. The functions project a schema onto its input or output side — useful for validating the two halves of a codec nested inside an object, where `.in` / `.out` cannot reach.
+
+```typescript
+const Event = z.object({ name: z.string(), at: stringToDate });
+
+z.input(Event).parse({ name: "launch", at: "2024-01-01T00:00:00Z" }); // ✅
+z.output(Event).parse({ name: "launch", at: new Date() });            // ✅
+```
+
+Only codecs have two real sides. `z.output()` on a one-way `.transform()` returns the transform (validates nothing); `z.input()` on a `z.preprocess()` returns the schema the preprocessor feeds. With a codec underneath, `z.input()` drops a `.default()`/`.catch()` and `z.output()` drops a `.prefault()`.
+
 ## Inverting codecs
 
 ```typescript

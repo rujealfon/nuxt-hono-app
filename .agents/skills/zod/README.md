@@ -6,8 +6,8 @@ data in TypeScript/JavaScript.
 
 ## Version
 
-- Skill version: **1.1.0** — see [CHANGELOG.md](CHANGELOG.md)
-- Tracks: `zod` 4.x — verified against 4.4.3 on 2026-08-23
+- Skill version: **1.2.0** — see [CHANGELOG.md](CHANGELOG.md)
+- Tracks: `zod` 4.x — verified against 4.5.4 on 2026-09-01
 - Docs: https://zod.dev/llms.txt
 
 ## Installation
@@ -26,9 +26,9 @@ Use $zod to validate this API request body and infer its TypeScript type.
 
 ## Coverage
 
-Zod 4 schemas, refinements/transforms (including `.overwrite()`), codecs, errors, JSON Schema, metadata/registries, and Zod 3 → 4 migration. The installed `zod` version is the API authority.
+Zod 4 schemas, refinements/transforms (including `.overwrite()`), codecs, errors, JSON Schema, metadata/registries, AOT compilation (`z.compile()`), and Zod 3 → 4 migration. The installed `zod` version is the API authority.
 
-Won't add: `z.compile()` AOT (canary-only as of 4.4.3), `z.creditCard()` / `.exactPartial()` (post-4.4.3), ecosystem catalog, library-authors packaging beyond the existing Mini/core pointer.
+Won't add: ecosystem catalog, library-authors packaging beyond the existing Mini/core pointer, compile internals / Moltar charts / memory-footprint blog, locale inventory, `__proto__` stripping, `fromJSONSchema` draft-edge cases.
 
 ## Contents
 
@@ -39,6 +39,7 @@ Won't add: `z.compile()` AOT (canary-only as of 4.4.3), `z.creditCard()` / `.exa
 - [references/codecs.md](references/codecs.md) covers bidirectional transforms.
 - [references/json-schema.md](references/json-schema.md) covers JSON Schema conversion.
 - [references/metadata-registries.md](references/metadata-registries.md) covers metadata and registries.
+- [references/compile.md](references/compile.md) covers AOT compilation.
 - [references/migration-v3-to-v4.md](references/migration-v3-to-v4.md) covers the Zod 3 → 4 migration and package variant selection.
 
 ## License

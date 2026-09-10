@@ -8,10 +8,10 @@
       "computedHash": "a8bf695463f58ccd4f3f9845fdd19392bc846bcb7602ae06ab165561b7774db4"
     },
     "hono": {
-      "source": "yusukebe/hono-skill",
+      "source": "honojs/skills",
       "sourceType": "github",
       "skillPath": "skills/hono/SKILL.md",
-      "computedHash": "220e5e1b12bbaeec49ec362b6e2262d77632d0536e9758bba9acbbc323fef990"
+      "computedHash": "e55b01b1b43d729c07c316eaee8a3746f5a654ea28545eb8ef9e676b2671049d"
     },
     "nuxt": {
       "source": "antfu/skills",
@@ -41,7 +41,7 @@
       "source": "rujealfon/skills",
       "sourceType": "github",
       "skillPath": "skills/zod/SKILL.md",
-      "computedHash": "4ab1d331e981c68c3490f6c7c32bccc51656e32dd233eb61931b35d5cc04e506"
+      "computedHash": "011a0b2967fe2439c1f5ed63513ffd59e67b204a9d8a6afa1503dab3c7c3ab9b"
     }
   }
 }

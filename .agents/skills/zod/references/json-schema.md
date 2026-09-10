@@ -19,7 +19,7 @@ interface ToJSONSchemaParams {
   target?: "draft-04" | "draft-07" | "draft-2020-12" | "openapi-3.0"; // default: draft-2020-12
   io?: "input" | "output";              // default: output
   metadata?: $ZodRegistry<Record<string, any>>;
-  unrepresentable?: "throw" | "any";    // default: throw
+  unrepresentable?: "throw" | "any" | ((ctx) => JSONSchema | "throw" | "any"); // default: throw
   cycles?: "ref" | "throw";             // default: ref
   reused?: "ref" | "inline";            // default: inline
   override?: (ctx) => void;             // mutate ctx.jsonSchema directly
@@ -39,7 +39,14 @@ z.toJSONSchema(mySchema, { io: "input" }); // => { type: "string" }
 
 ### `unrepresentable`
 
-These have no JSON Schema equivalent and **throw by default**: `z.bigint()`, `z.int64()`, `z.symbol()`, `z.undefined()`, `z.void()`, `z.date()`, `z.map()`, `z.set()`, `z.transform()`, `z.nan()`, `z.custom()`. Set `unrepresentable: "any"` to convert them to `{}` (JSON Schema's `unknown`) instead of throwing.
+These have no JSON Schema equivalent and **throw by default**: `z.bigint()`, `z.int64()`, `z.symbol()`, `z.undefined()`, `z.void()`, `z.date()`, `z.map()`, `z.set()`, `z.transform()`, `z.nan()`, `z.custom()`. Set `unrepresentable: "any"` to convert them to `{}` (JSON Schema's `unknown`) instead of throwing. Or pass a **function** that returns a JSON Schema, `"any"`, or `"throw"` — prefer that over `"any"` + `override` when only some types need a substitute.
+
+```typescript
+z.toJSONSchema(z.object({ createdAt: z.date(), id: z.bigint() }), {
+  unrepresentable: ({ zodSchema }) =>
+    zodSchema._zod.def.type === "date" ? { type: "string", format: "date-time" } : "throw",
+});
+```
 
 ### `cycles`
 
@@ -51,7 +58,7 @@ A schema referenced multiple times is inlined at each occurrence by default. Set
 
 ### `metadata`
 
-Fields registered via `.meta()`/`z.globalRegistry` (title, description, examples, arbitrary keys) are copied verbatim into the output JSON Schema. See [metadata-registries.md](metadata-registries.md).
+Fields registered via `.meta()`/`z.globalRegistry` (title, description, examples, arbitrary keys) are copied verbatim into the output JSON Schema and **win over** keywords Zod generates (`z.string().meta({ type: "number" })` emits `{ type: "number" }`). See [metadata-registries.md](metadata-registries.md).
 
 ### `override`
 
@@ -70,7 +77,7 @@ z.toJSONSchema(z.date(), {
 });
 ```
 
-Unrepresentable types throw *before* `override` runs — pair `unrepresentable: "any"` with `override` when you're defining custom behavior for one.
+Unrepresentable types throw *before* `override` runs. Substitute a single type with an `unrepresentable` function (above); `unrepresentable: "any"` + `override` still works but erases every unrepresentable type.
 
 ## Conversion reference
 
